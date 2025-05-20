@@ -1,5 +1,11 @@
 # TIG (Text Image Generator)
 
+> [!WARNING]
+> This is a WIP project. Anything can be broken at any time until a stable release!
+
+> [!NOTE]
+> As of now it's expected that user of this project knows basic python syntax and can modify the files directly
+
 DESCRIPTION: TBD.
 
 ## Usage (Subject to change)
