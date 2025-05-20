@@ -35,23 +35,14 @@ ability to run script without having to modify code directly will be added soon
 
 ## Preview of output
 
-<figure>
-  <img
-    src="./docs/preview-line.png"
-    alt="./line.py output" />
-  <figcaption align="center">./line.py output</figcaption>
-</figure>
+./line.py output
 
-<figure>
-  <img
-    src="./docs/preview-lines.png"
-    alt="./lines.py output" />
-  <figcaption align="center">./lines.py output</figcaption>
-</figure>
+![./line.py output](./docs/preview-line.png)
 
-<figure>
-  <img
-    src="./docs/preview-angeled-lines.png"
-    alt="./angeled_lines.py output" />
-  <figcaption align="center">./angeled_lines.py output</figcaption>
-</figure>
+./lines.py output
+
+![./lines.py output](./docs/preview-lines.png)
+
+./angeled_lines.py output
+
+![./angeled_lines.py output](./docs/preview-angeled-lines.png)
