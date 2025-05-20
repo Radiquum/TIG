@@ -1,0 +1,6 @@
+.python-venv/
+.venv/
+
+__NOT_WORKING__*
+*.png
+!docs/*.png
