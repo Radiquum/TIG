@@ -2,7 +2,7 @@
 
 DESCRIPTION: TBD.
 
-# Usage (Subject to change)
+## Usage (Subject to change)
 
 Requirements:
     - Python 3
@@ -21,18 +21,37 @@ Requirements:
     pip install -r ./requirements.txt
     ```
 
-3. modify constants on the top of the file `line.py` to your liking,
+3. modify constants on the top of the mode file to your liking,
 
     note: colors should be provided as a full hex colors
 
-4. run script `python ./line.py`
+4. run modified script `python ./<filename>.py`
 
-# Footnote
+## Footnote
 
 Inspired by stanley parable loading screen
 
-Right now only mode supported is a line of repeated text. More modes and UX without having to modify code directly will be added soon
+ability to run script without having to modify code directly will be added soon
 
-# Preview of output
+## Preview of output
 
-![line preview](./docs/preview-line.png)
+<figure>
+  <img
+    src="./docs/preview-line.png"
+    alt="./line.py output" />
+  <figcaption align="center">./line.py output</figcaption>
+</figure>
+
+<figure>
+  <img
+    src="./docs/preview-lines.png"
+    alt="./lines.py output" />
+  <figcaption align="center">./lines.py output</figcaption>
+</figure>
+
+<figure>
+  <img
+    src="./docs/preview-angeled-lines.png"
+    alt="./angeled_lines.py output" />
+  <figcaption align="center">./angeled_lines.py output</figcaption>
+</figure>
