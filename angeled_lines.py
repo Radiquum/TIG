@@ -4,11 +4,11 @@ from PIL import Image, ImageFont, ImageDraw
 
 RESOLUTION = (2560, 1440)
 RESOLUTION_FG = (RESOLUTION[0] * 2, RESOLUTION[1] * 2)
-FONT = ImageFont.truetype("./fonts/BebasNeue/Bebas_Neue_Regular.ttf", 72)
-TEXT = "HELLO, WORLD! "
-TEXT_COLOR = "#ffffff"
-BG_COLOR = "#000000"
-ANGLE = 15
+FONT = ImageFont.truetype("./fonts/BebasNeue/Bebas_Neue_Regular.ttf", 96)
+TEXT = "WAH"
+TEXT_COLOR = "#fd943b"
+BG_COLOR = "#0d1117"
+ANGLE = 10
 
 # --- Line Gen Code
 
@@ -22,12 +22,12 @@ image_FG_draw.fontmode = "L"
 
 text_size = image_FG_draw.textlength(TEXT)
 render_x_offset = -16  # set offset of the start
-render_y_offset = 0  # set offset of the start
+render_y_offset = 8  # set offset of the start
 render_x_pos = 0 + render_x_offset  # set start x pos
 render_y_pos = 0 + render_y_offset  # set y pos
 
 total_words = round((RESOLUTION_FG[0] / (text_size + 4))) + 1
-total_lines = round((RESOLUTION_FG[1] / 64)) + 1
+total_lines = round((RESOLUTION_FG[1] / (64 + 8))) + 1
 accent_line = total_lines - (round(16 * 1.4))  # set which line will be highlighted as a full solid color
 current_line = 0
 current_word = 0
@@ -61,7 +61,7 @@ while current_line < total_lines:
 
     render_x_pos = 0 + (render_x_offset * current_line)
     current_word = 0
-    render_y_pos += 64
+    render_y_pos += 64 + 16
     current_line += 1
 
 
@@ -77,7 +77,7 @@ def crop_center(pil_img, crop_width, crop_height):
     )
 
 
-image_FG = image_FG.rotate(ANGLE, expand=1)
+image_FG = image_FG.rotate(ANGLE, resample=Image.BICUBIC, expand=1)
 image_FG = crop_center(image_FG, RESOLUTION[0], RESOLUTION[1])
 
 image.paste(image_FG, (0, 0))
