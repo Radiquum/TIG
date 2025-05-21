@@ -4,6 +4,8 @@ from modules.cli.help import (
     print_config_inspect_cmd_help,
     print_config_set_cmd_help,
     print_main_help,
+    print_draw_cmd_help,
+    print_draw_cmd_cmd_help
 )
 from rich import print
 import os
@@ -118,6 +120,20 @@ if cmd_or_arg == "config":
 
         config.update_and_save(sk[0], sk[1], cmd_or_arg)
         sys.exit(0)
+
+if cmd_or_arg == "draw":
+    cmd = shift_argv()
+    if not cmd or cmd in ["help", "-h", "--help"]:
+        print_draw_cmd_help(program_name)
+
+    arg = shift_argv()
+    if cmd == "line" and arg in ["help", "-h", "--help", None]:
+        print_draw_cmd_cmd_help(program_name, cmd)
+
+    if cmd == "fill" and arg in ["help", "-h", "--help", None]:
+        print_draw_cmd_cmd_help(program_name, cmd)
+
+    sys.exit(0)
 
 if len(arguments) > 0:
     print(
