@@ -29,9 +29,8 @@ def draw_fill(width: int, height: int,
         y_pos = height + y_pos
     render_y_pos = y_pos + y_offset
 
-    total_words = round(((width - x_pos) // (text_size + x_margin))) + 1
+    total_words = round(((width - x_pos) // (text_size + x_margin))) + 2
     total_lines = round(((height - y_pos) // (font_size + y_margin))) + 2
-    print(f"[bold cyan]TOTAL WORDS IN LINE:[/bold cyan] {total_words}")
     print(f"[bold cyan]TOTAL LINES:[/bold cyan] {(total_lines - 1)}")
     print(f"[bold cyan]CENTER:[/bold cyan]      {(total_lines - 1) // 2}")
 
