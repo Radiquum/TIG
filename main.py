@@ -7,6 +7,7 @@ from modules.cli.help import (
     print_draw_cmd_help,
     print_draw_cmd_cmd_help,
 )
+from shared.util import generate_random_symbols
 from rich import print
 import os
 import sys
@@ -257,8 +258,20 @@ if cmd_or_arg == "draw":
         print(f"{arguments}")
         sys.exit(1)
 
+    print(f"[bold green]------ USING PARAMS ------[/bold green]")
+    print(f"mode:       {cmd}")
+    print(f"resolution: {width}x{height}px")
+    print(f"font:       {font_file}, {font_size}pt")
+    print(f"colors:     FG: {text_color}, BG: {bg_color}")
+    print(f"            opacity:  {opacity}")
+    print(f"accent:     {accent}  ")
+    print(f"margin:     hor: {x_margin}, ver: {y_margin}")
+    print(f"x:          pos: {x_pos}, offset: {x_offset}")
+    print(f"y:          pos: {y_pos}, offset: {y_offset}")
+    print(f"[bold green]--------------------------[/bold green]")
+
     if cmd == "line":
-        draw_line(
+        image = draw_line(
             width,
             height,
             font_file,
@@ -273,11 +286,10 @@ if cmd_or_arg == "draw":
             opacity,
             accent,
             x_margin,
-            preview_only,
         )
 
     if cmd == "fill":
-        draw_fill(
+        image = draw_fill(
             width,
             height,
             font_file,
@@ -293,7 +305,12 @@ if cmd_or_arg == "draw":
             accent,
             x_margin,
             y_margin,
-            preview_only,
+        )
+
+    image.show()
+    if not preview_only:
+        image.save(
+            f"{cmd}_{width}x{height}_fg-{text_color[1:]}_bg-{bg_color[1:]}_{generate_random_symbols(6)}.png"
         )
 
     sys.exit(0)

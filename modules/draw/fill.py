@@ -1,13 +1,12 @@
 from PIL import Image, ImageFont, ImageDraw
 from rich import print
-from shared.util import hex_to_rgb, rgb_to_rgba, generate_random_symbols
+from shared.util import hex_to_rgb, rgb_to_rgba
 
 def draw_fill(width: int, height: int,
             font_file: str, font_size: int,
             text: str, text_color: str, bg_color: str,
             x_offset: int, x_pos: str, y_offset: int, y_pos: int,
             opacity: float, accent: int, x_margin: int, y_margin: int,
-            preview_only: bool
         ):
     RESOLUTION = (width, height)
     FONT = ImageFont.truetype(font_file, font_size)
@@ -65,6 +64,4 @@ def draw_fill(width: int, height: int,
     image.paste(image_FG)
     image = Image.alpha_composite(image_BG, image_FG)
 
-    image.show()
-    if not preview_only:
-        image.save(f"line_{width}x{height}_fg-{text_color[1:]}_bg-{bg_color[1:]}_{generate_random_symbols(6)}.png")
+    return image
