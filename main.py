@@ -1,4 +1,10 @@
 from shared.config import config
+from modules.cli.help import (
+    print_config_cmd_help,
+    print_config_inspect_cmd_help,
+    print_config_set_cmd_help,
+    print_main_help,
+)
 from rich import print
 import os
 import sys
@@ -27,74 +33,10 @@ def shift_argv():
 
 
 program_name = shift_argv()
-
-
-def print_main_help():
-    print(f"Usage: {program_name} [-h] [-c config_path] <config>")
-    print(f"")
-    print(f"commands:")
-    print(f"config              modify config file")
-    print(f"")
-    print(f"options:")
-    print(f"-h, --help          show this help message and exit")
-    print(f"-c, --config        path to a config file, default: config.yaml")
-    sys.exit(0)
-
-
-def print_config_cmd_help():
-    print(f"Usage: {program_name} [-c config_path] config [-h] <set,inspect>")
-    print(f"")
-    print(f"commands:")
-    print(f"inspect             display current loaded configuration")
-    print(f"")
-    print(f"options:")
-    print(f"-h, --help          show this help message and exit")
-    print(f"-c, --config        path to a config file, default: config.yaml")
-    sys.exit(0)
-
-
-def print_config_set_cmd_help():
-    print(
-        f"Usage: {program_name} [-c config_path] config set [-h] <section>.<key> <value>"
-    )
-    print(f"")
-    print(f"arguments:")
-    print(f"section.key         section.key inside of config, one of:")
-    print(f"                        resolution:")
-    print(f"                            - width")
-    print(f"                            - height")
-    print(f"                        font:")
-    print(f"                            - file")
-    print(f"                            - size")
-    print(f"                        text:")
-    print(f"                            - color")
-    print(f"                        background:")
-    print(f"                            - color")
-    print(f"value               value to set")
-    print(f"")
-    print(f"options:")
-    print(f"-h, --help          show this help message and exit")
-    print(f"-c, --config        path to a config file, default: config.yaml")
-    sys.exit(0)
-
-
-def print_config_inspect_cmd_help():
-    print(f"Usage: {program_name} [-c config_path] config inspect [-h] <yaml,json>")
-    print(f"")
-    print(f"arguments:")
-    print(f"yaml                display current loaded configuration in yaml format")
-    print(f"json                display current loaded configuration in json format")
-    print(f"")
-    print(f"options:")
-    print(f"-h, --help          show this help message and exit")
-    print(f"-c, --config        path to a config file, default: config.yaml")
-    sys.exit(0)
-
-
 cmd_or_arg = shift_argv()
 
 if not cmd_or_arg or cmd_or_arg in ["help", "-h", "--help"]:
-    print_main_help()
+    print_main_help(program_name)
 
 if cmd_or_arg in ["-c", "--config"]:
     path: str = shift_argv()
@@ -107,16 +49,16 @@ if cmd_or_arg in ["-c", "--config"]:
     config.load(path)
     cmd_or_arg = shift_argv()
     if not cmd_or_arg:
-        print_main_help()
+        print_main_help(program_name)
 
 if cmd_or_arg == "config":
     cmd_or_arg = shift_argv()
     if not cmd_or_arg or cmd_or_arg in ["help", "-h", "--help"]:
-        print_config_cmd_help()
+        print_config_cmd_help(program_name)
     if cmd_or_arg == "inspect":
         cmd_or_arg = shift_argv()
         if not cmd_or_arg or cmd_or_arg in ["help", "-h", "--help"]:
-            print_config_inspect_cmd_help()
+            print_config_inspect_cmd_help(program_name)
         if cmd_or_arg == "yaml":
             print(config.yaml())
             sys.exit(0)
@@ -126,44 +68,44 @@ if cmd_or_arg == "config":
     if cmd_or_arg == "set":
         cmd_or_arg = shift_argv()
         if not cmd_or_arg or cmd_or_arg in ["help", "-h", "--help"]:
-            print_config_set_cmd_help()
+            print_config_set_cmd_help(program_name)
 
         sk = cmd_or_arg.split(".")
         if len(sk) < 2 or sk[1] == "":
             print(
                 f"[bold red]ERROR:[/bold red] expected: section.key, got: {cmd_or_arg}"
             )
-            print_config_set_cmd_help()
+            print_config_set_cmd_help(program_name)
 
         if sk[0] not in config.get_keys():
             print(
                 f"[bold red]ERROR:[/bold red] wrong section name: {sk[0]}, should be one of {", ".join(config.get_keys())}"
             )
-            print_config_set_cmd_help()
+            print_config_set_cmd_help(program_name)
 
         if sk[0] == "resolution":
             if sk[1] not in config.get_section_keys("resolution"):
                 print(
                     f"[bold red]ERROR:[/bold red] wrong section key: {sk[1]}, should be one of {", ".join(config.get_section_keys("resolution"))}"
                 )
-                print_config_set_cmd_help()
+                print_config_set_cmd_help(program_name)
         if sk[0] == "font":
             if sk[1] not in config.get_section_keys("font"):
                 print(
                     f"[bold red]ERROR:[/bold red] wrong section key: {sk[1]}, should be one of {", ".join(config.get_section_keys("font"))}"
                 )
-                print_config_set_cmd_help()
+                print_config_set_cmd_help(program_name)
         if sk[0] in ["text", "background"]:
             if sk[1] not in config.get_section_keys("text"):
                 print(
                     f"[bold red]ERROR:[/bold red] wrong section key: {sk[1]}, should be one of {", ".join(config.get_section_keys("text"))}"
                 )
-                print_config_set_cmd_help()
+                print_config_set_cmd_help(program_name)
 
         cmd_or_arg = shift_argv()
         if not cmd_or_arg:
             print(f"[bold red]ERROR:[/bold red] value not provided")
-            print_config_set_cmd_help()
+            print_config_set_cmd_help(program_name)
 
         chk, exp_type = config.check_value_type(sk[0], sk[1], cmd_or_arg)
         if chk is not True:
