@@ -11,6 +11,7 @@ from rich import print
 import os
 import sys
 from modules.draw.line import draw_line
+from modules.draw.fill import draw_fill
 
 if os.path.exists("config.yaml"):
     config.load()
@@ -244,6 +245,25 @@ if cmd_or_arg == "draw":
 
     if cmd == "line":
         draw_line(
+            width,
+            height,
+            font_file,
+            font_size,
+            text,
+            text_color,
+            bg_color,
+            x_offset,
+            x_pos,
+            y_offset,
+            y_pos,
+            opacity,
+            accent,
+            margin,
+            preview_only,
+        )
+
+    if cmd == "fill":
+        draw_fill(
             width,
             height,
             font_file,

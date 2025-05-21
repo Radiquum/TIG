@@ -2,7 +2,7 @@ from PIL import Image, ImageFont, ImageDraw
 from rich import print
 from shared.util import hex_to_rgb, rgb_to_rgba, generate_random_symbols
 
-def draw_line(width: int, height: int,
+def draw_fill(width: int, height: int,
             font_file: str, font_size: int,
             text: str, text_color: str, bg_color: str,
             x_offset: int, x_pos: str, y_offset: int, y_pos: int,
@@ -31,26 +31,36 @@ def draw_line(width: int, height: int,
     render_y_pos = y_pos + y_offset
 
     total_words = round(((width - x_pos) // (text_size + margin))) + 1
-    print(f"[bold cyan]TOTAL WORDS:[/bold cyan] {total_words}")
-    print(f"[bold cyan]CENTER:[/bold cyan]      {total_words // 2}")
+    total_lines = round(((height - y_pos) // (font_size + margin))) + 2
+    print(f"[bold cyan]TOTAL WORDS IN LINE:[/bold cyan] {total_words}")
+    print(f"[bold cyan]TOTAL LINES:[/bold cyan] {(total_lines - 1)}")
+    print(f"[bold cyan]CENTER:[/bold cyan]      {(total_lines - 1) // 2}")
 
     if accent < 0:
-        accent = total_words + accent
+        accent = total_lines + accent
 
     # Loop
     current_word = 0
+    current_line = 1
     col = hex_to_rgb(text_color)
     transp_col = rgb_to_rgba(col, round(255 * opacity))
     accent_col = rgb_to_rgba(col, 255)
 
-    while current_word < total_words:
+    while current_line < total_lines:
         col = transp_col
-        if (current_word + 1) == accent:
+        if current_line == accent:
             col = accent_col
-        image_FG_draw.text((render_x_pos, render_y_pos), text, fill=col)
 
-        render_x_pos += text_size + margin
-        current_word += 1
+        while current_word < total_words:
+            image_FG_draw.text((render_x_pos, render_y_pos), text, fill=col)
+
+            render_x_pos += text_size + margin
+            current_word += 1
+
+        render_x_pos = 0 + (x_offset * current_line)
+        current_word = 0
+        render_y_pos += font_size + margin
+        current_line += 1
 
     image.paste(image_FG)
     image = Image.alpha_composite(image_BG, image_FG)
