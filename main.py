@@ -19,19 +19,12 @@ arguments = sys.argv.copy()
 
 
 def shift_argv():
-    print("------ ARGS SHIFT -------")
     global arguments
     if len(arguments) == 0:
-        print(f"Return ARG: None")
-        print(f"REST:       {arguments}")
-        print("-------------------------")
         return None
 
     _arg = arguments[0]
     arguments = arguments[1::]
-    print(f"Return ARG: {_arg}")
-    print(f"REST:       {arguments}")
-    print("-------------------------")
     return _arg
 
 
@@ -269,8 +262,3 @@ if cmd_or_arg == "draw":
         )
 
     sys.exit(0)
-
-if len(arguments) > 0:
-    print(
-        f"[bold yellow]WARN:[/bold yellow] Not all arguments has been consumed, rest: {arguments}"
-    )
