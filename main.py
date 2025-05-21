@@ -63,6 +63,13 @@ def print_config_set_cmd_help():
     print(f"                        resolution:")
     print(f"                            - width")
     print(f"                            - height")
+    print(f"                        font:")
+    print(f"                            - file")
+    print(f"                            - size")
+    print(f"                        text:")
+    print(f"                            - color")
+    print(f"                        background:")
+    print(f"                            - color")
     print(f"value               value to set")
     print(f"")
     print(f"options:")
@@ -140,18 +147,32 @@ if cmd_or_arg == "config":
                     f"[bold red]ERROR:[/bold red] wrong section key: {sk[1]}, should be one of {", ".join(config.get_section_keys("resolution"))}"
                 )
                 print_config_set_cmd_help()
+        if sk[0] == "font":
+            if sk[1] not in config.get_section_keys("font"):
+                print(
+                    f"[bold red]ERROR:[/bold red] wrong section key: {sk[1]}, should be one of {", ".join(config.get_section_keys("font"))}"
+                )
+                print_config_set_cmd_help()
+        if sk[0] in ["text", "background"]:
+            if sk[1] not in config.get_section_keys("text"):
+                print(
+                    f"[bold red]ERROR:[/bold red] wrong section key: {sk[1]}, should be one of {", ".join(config.get_section_keys("text"))}"
+                )
+                print_config_set_cmd_help()
 
         cmd_or_arg = shift_argv()
         if not cmd_or_arg:
             print(f"[bold red]ERROR:[/bold red] value not provided")
             print_config_set_cmd_help()
 
-        chk = config.check_value_type(sk[0], sk[1], cmd_or_arg)
-        if sk[0] == "resolution":
-            if chk is not True:
-                print(f"[bold red]ERROR:[/bold red] value should be a number")
-                sys.exit(1)
+        chk, exp_type = config.check_value_type(sk[0], sk[1], cmd_or_arg)
+        if chk is not True:
+            print(f"[bold red]ERROR:[/bold red] value should be a {exp_type}")
+            sys.exit(1)
+        if exp_type == "number":
             cmd_or_arg = int(cmd_or_arg)
+        if exp_type == "xxxxxx":
+            cmd_or_arg = f"#{cmd_or_arg}"
 
         config.update_and_save(sk[0], sk[1], cmd_or_arg)
         sys.exit(0)

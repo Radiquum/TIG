@@ -1,7 +1,7 @@
 import yaml
 import os
 from rich import print
-from .util import check_int
+from .util import check_int, check_hex
 
 
 class Config:
@@ -18,7 +18,10 @@ class Config:
             "resolution": {
                 "width": 1920,
                 "height": 1080,
-            }
+            },
+            "font": {"file": "./fonts/BebasNeue/Bebas_Neue_Regular.ttf", "size": 72},
+            "text": {"color": "#ffffff"},
+            "background": {"color": "#000000"},
         }
 
     def get_keys(self):
@@ -33,11 +36,21 @@ class Config:
     def get_section_key(self, section: str, key: str):
         return self._conf[section][key]
 
-    def check_value_type(self, section: str, key: str, value: str | int):
+    def check_value_type(
+        self, section: str, key: str, value: str | int
+    ) -> tuple[bool, str]:
         if section in ["resolution"] and key in self.get_section_keys("resolution"):
             if check_int(value):
-                return True
-            return type(value)
+                return True, "number"
+            return False, "number"
+        if section in ["font"]:
+            if key == "size":
+                if check_int(value):
+                    return True, "number"
+                return False, "number"
+            return True, "string"
+        if section in ["text", "background"] and key in self.get_section_keys("text"):
+            return check_hex(value), "xxxxxx"
         raise
 
     def save(self, path: str | None = None):
