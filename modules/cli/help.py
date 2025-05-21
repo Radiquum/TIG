@@ -4,6 +4,7 @@ from rich import print
 
 def print_main_help(program_name: str):
     print(f"Usage: {program_name} [-h] [-c config_path] <config,draw>")
+    print(f"NOTE: All arguments are case and order sensitive")
     print(f"")
     print(f"commands:")
     print(f"config              modify config file")
@@ -17,6 +18,7 @@ def print_main_help(program_name: str):
 
 def print_config_cmd_help(program_name: str):
     print(f"Usage: {program_name} [-c config_path] config [-h] <set,inspect>")
+    print(f"NOTE: All arguments are case and order sensitive")
     print(f"")
     print(f"commands:")
     print(f"set                 set configuration")
@@ -32,6 +34,7 @@ def print_config_set_cmd_help(program_name: str):
     print(
         f"Usage: {program_name} [-c config_path] config set [-h] <section>.<key> <value>"
     )
+    print(f"NOTE: All arguments are case and order sensitive")
     print(f"")
     print(f"arguments:")
     print(f"section.key         section.key inside of config, one of:")
@@ -55,6 +58,7 @@ def print_config_set_cmd_help(program_name: str):
 
 def print_config_inspect_cmd_help(program_name: str):
     print(f"Usage: {program_name} [-c config_path] config inspect [-h] <yaml,json>")
+    print(f"NOTE: All arguments are case and order sensitive")
     print(f"")
     print(f"arguments:")
     print(f"yaml                display configuration in yaml format")
@@ -68,6 +72,7 @@ def print_config_inspect_cmd_help(program_name: str):
 
 def print_draw_cmd_help(program_name: str):
     print(f"Usage: {program_name} [-c config_path] draw [-h] <line,fill>")
+    print(f"NOTE: All arguments are case and order sensitive")
     print(f"")
     print(f"commands:")
     print(f"line                draw a line of repeated text")
@@ -83,7 +88,8 @@ def print_draw_cmd_cmd_help(program_name: str, cmd: str):
     print(f"Usage: {program_name} [-c config_path] draw {cmd} [-h] <text> [--opacity] [--accent] [--resolution] [--margin]")
     print(f"                                                  [--x-offset] [--x-pos] [--y-offset] [--y-pos]")
     print(f"                                                  [--text-color] [--background-color] [--font-size]")
-    print(f"                                                  [--calc] [--preview]")
+    print(f"                                                  [--preview]")
+    print(f"NOTE: All arguments are case and order sensitive")
     print(f"")
     print(f"arguments:")
     print(f"text                  define what text to draw")
@@ -91,18 +97,17 @@ def print_draw_cmd_cmd_help(program_name: str, cmd: str):
     print(f"options:")
     print(f"-h, --help            show this help message and exit")
     print(f"-c, --config          path to a config file, default: config.yaml")
-    print(f"--opacity   0-1       how transparent not accented words or lines will be")
-    print(f"--accent    number    what word or line will should be accented")
+    print(f"--opacity   0-1       how transparent not accented words or lines will be, default: 0.25")
+    print(f"--accent    number    what word or line will should be accented, default: -3")
     print(f"--resolution WxH      overwrite resolution")
-    print(f"--margin              set margin between words")
-    print(f"--x-pos               set start x position")
-    print(f"--x-offset            offset the x position")
-    print(f"--y-pos               set start y position")
-    print(f"--y-offset            offset the y position")
+    print(f"--margin              set margin between words, default: 4")
+    print(f"--x-pos               set start x position, default: 0")
+    print(f"--x-offset            offset the x position, default: 0")
+    print(f"--y-pos               set start y position, default: 0")
+    print(f"--y-offset            offset the y position, default: 0")
     print(f"--text-color xxxxxx   overwrite text color")
     print(f"--background-color    overwrite background color")
     print(f"--font-size           overwrite font size")
-    print(f"--calc                calculate how much words or lines will be on image")
     print(f"--preview             open and don't save the image after generating")
     sys.exit(0)
 
