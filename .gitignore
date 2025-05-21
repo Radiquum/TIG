@@ -5,3 +5,5 @@ __pycache__
 __NOT_WORKING__*
 *.png
 !docs/*.png
+
+*.yaml

@@ -26,12 +26,6 @@ def shift_argv():
     return _arg
 
 
-def check_int(s):
-    if s[0] in ("-", "+"):
-        return s[1:].isdigit()
-    return s.isdigit()
-
-
 program_name = shift_argv()
 
 
@@ -134,18 +128,16 @@ if cmd_or_arg == "config":
             )
             print_config_set_cmd_help()
 
-        sections = ["resolution"]
-        if sk[0] not in sections:
+        if sk[0] not in config.get_keys():
             print(
-                f"[bold red]ERROR:[/bold red] wrong section name: {sk[0]}, should be one of {", ".join(sections)}"
+                f"[bold red]ERROR:[/bold red] wrong section name: {sk[0]}, should be one of {", ".join(config.get_keys())}"
             )
             print_config_set_cmd_help()
 
         if sk[0] == "resolution":
-            keys = ["width", "height"]
-            if sk[1] not in keys:
+            if sk[1] not in config.get_section_keys("resolution"):
                 print(
-                    f"[bold red]ERROR:[/bold red] wrong section key: {sk[1]}, should be one of {", ".join(keys)}"
+                    f"[bold red]ERROR:[/bold red] wrong section key: {sk[1]}, should be one of {", ".join(config.get_section_keys("resolution"))}"
                 )
                 print_config_set_cmd_help()
 
@@ -154,8 +146,9 @@ if cmd_or_arg == "config":
             print(f"[bold red]ERROR:[/bold red] value not provided")
             print_config_set_cmd_help()
 
-        if sk[0] in [sections[0]] and sk[1] in [keys[0], keys[1]]:
-            if not check_int(cmd_or_arg):
+        chk = config.check_value_type(sk[0], sk[1], cmd_or_arg)
+        if sk[0] == "resolution":
+            if chk is not True:
                 print(f"[bold red]ERROR:[/bold red] value should be a number")
                 sys.exit(1)
             cmd_or_arg = int(cmd_or_arg)

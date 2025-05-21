@@ -1,6 +1,7 @@
 import yaml
 import os
 from rich import print
+from .util import check_int
 
 
 class Config:
@@ -19,6 +20,25 @@ class Config:
                 "height": 1080,
             }
         }
+
+    def get_keys(self):
+        return list(self._conf.keys())
+
+    def get_section(self, section: str):
+        return self._conf[section]
+
+    def get_section_keys(self, section: str):
+        return list(self._conf[section].keys())
+
+    def get_section_key(self, section: str, key: str):
+        return self._conf[section][key]
+
+    def check_value_type(self, section: str, key: str, value: str | int):
+        if section in ["resolution"] and key in self.get_section_keys("resolution"):
+            if check_int(value):
+                return True
+            return type(value)
+        raise
 
     def save(self, path: str | None = None):
         if path is None:
