@@ -165,13 +165,22 @@ if cmd_or_arg == "draw":
         height = int(resolution[1])
         arg = shift_argv()
 
-    margin = 4
-    if arg == "--margin":
-        margin = shift_argv()
-        if not margin:
-            print(f"[bold red]ERROR:[/bold red] margin value not provided")
+    x_margin = 4
+    if arg == "--x-margin":
+        x_margin = shift_argv()
+        if not x_margin:
+            print(f"[bold red]ERROR:[/bold red] x margin value not provided")
             sys.exit(1)
-        margin = int(margin)
+        x_margin = int(x_margin)
+        arg = shift_argv()
+
+    y_margin = -24
+    if arg == "--x-margin":
+        y_margin = shift_argv()
+        if not y_margin:
+            print(f"[bold red]ERROR:[/bold red] y margin value not provided")
+            sys.exit(1)
+        y_margin = int(y_margin)
         arg = shift_argv()
 
     x_offset = 0
@@ -243,6 +252,11 @@ if cmd_or_arg == "draw":
         preview_only = True
         arg = shift_argv()
 
+    if len(arguments) > 0:
+        print(f"[bold red]ERROR:[/bold red] some arguments weren't processed")
+        print(f"{arguments}")
+        sys.exit(1)
+
     if cmd == "line":
         draw_line(
             width,
@@ -258,7 +272,7 @@ if cmd_or_arg == "draw":
             y_pos,
             opacity,
             accent,
-            margin,
+            x_margin,
             preview_only,
         )
 
@@ -277,7 +291,8 @@ if cmd_or_arg == "draw":
             y_pos,
             opacity,
             accent,
-            margin,
+            x_margin,
+            y_margin,
             preview_only,
         )
 

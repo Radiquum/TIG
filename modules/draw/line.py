@@ -6,7 +6,7 @@ def draw_line(width: int, height: int,
             font_file: str, font_size: int,
             text: str, text_color: str, bg_color: str,
             x_offset: int, x_pos: str, y_offset: int, y_pos: int,
-            opacity: float, accent: int, margin: int,
+            opacity: float, accent: int, x_margin: int,
             preview_only: bool
         ):
     RESOLUTION = (width, height)
@@ -30,7 +30,7 @@ def draw_line(width: int, height: int,
         y_pos = height + y_pos
     render_y_pos = y_pos + y_offset
 
-    total_words = round(((width - x_pos) // (text_size + margin))) + 1
+    total_words = round(((width - x_pos) // (text_size + x_margin))) + 1
     print(f"[bold cyan]TOTAL WORDS:[/bold cyan] {total_words}")
     print(f"[bold cyan]CENTER:[/bold cyan]      {total_words // 2}")
 
@@ -49,7 +49,7 @@ def draw_line(width: int, height: int,
             col = accent_col
         image_FG_draw.text((render_x_pos, render_y_pos), text, fill=col)
 
-        render_x_pos += text_size + margin
+        render_x_pos += text_size + x_margin
         current_word += 1
 
     image.paste(image_FG)

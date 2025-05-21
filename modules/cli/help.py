@@ -85,7 +85,8 @@ def print_draw_cmd_help(program_name: str):
 
 
 def print_draw_cmd_cmd_help(program_name: str, cmd: str):
-    print(f"Usage: {program_name} [-c config_path] draw {cmd} [-h] <text> [--opacity] [--accent] [--resolution] [--margin]")
+    print(f"Usage: {program_name} [-c config_path] draw {cmd} [-h] <text> [--opacity] [--accent] [--resolution]")
+    print(f"                                                  [--x-margin] [--y-margin]")
     print(f"                                                  [--x-offset] [--x-pos] [--y-offset] [--y-pos]")
     print(f"                                                  [--text-color] [--background-color] [--font-size]")
     print(f"                                                  [--preview]")
@@ -100,7 +101,8 @@ def print_draw_cmd_cmd_help(program_name: str, cmd: str):
     print(f"--opacity   0-1       how transparent not accented words or lines will be, default: 0.25")
     print(f"--accent    number    what word or line will should be accented, default: -3")
     print(f"--resolution WxH      overwrite resolution")
-    print(f"--margin              set margin between words, default: 4")
+    print(f"--x-margin            set margin between words, default: 4")
+    print(f"--y-margin            set margin between lines, default: -24")
     print(f"--x-pos               set start x position, default: 0")
     print(f"--x-offset            offset the x position, default: 0")
     print(f"--y-pos               set start y position, default: 0")
