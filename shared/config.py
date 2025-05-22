@@ -45,6 +45,33 @@ class Config:
     def get_section_key(self, section: str, key: str):
         return self._conf[section][key]
 
+    def get_config_section_key_type(self, section: str, key: str):
+        ktype = self.get_section_key(section, key)
+        if isinstance(ktype, int):
+            return f"number"
+        if isinstance(ktype, str):
+            if key == "color":
+                return f"hex[value] | rgb[0-255,0-255,0-255]"
+            else:
+                return f"string"
+
+    def get_config_sections_and_keys(self):
+        string = ""
+        for sect in self.get_keys():
+            string += f"{sect}:\n"
+            for key in self.get_section_keys(sect):
+                string += f"  - {key}\n"
+        return string
+
+    def get_config_sections_and_keys_types(self):
+        string = ""
+        for sect in self.get_keys():
+            string += f"{sect}:\n"
+            for key in self.get_section_keys(sect):
+                string += f"  - {key}: {self.get_config_section_key_type(sect, key)}\n"
+
+        return string
+
     def check_value_type(
         self, section: str, key: str, value: str | int
     ) -> tuple[bool, str]:

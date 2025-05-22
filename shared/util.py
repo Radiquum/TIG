@@ -14,6 +14,14 @@ def check_hex(s: str) -> bool:
     return True
 
 
+def str_to_hex(s: str) -> str:
+    return f"#{s}"
+
+
+def rgb_to_hex(r: int, g: int, b: int) -> str:
+    return "#{:02x}{:02x}{:02x}".format(r, g, b)
+
+
 def hex_to_rgb(value):
     value = value.lstrip("#")
     lv = len(value)
@@ -28,6 +36,7 @@ def generate_random_symbols(length: int):
     characters = string.ascii_letters + string.digits
     random_string = "".join(random.choice(characters) for _ in range(length))
     return random_string
+
 
 def crop_center(pil_img, crop_width, crop_height):
     img_width, img_height = pil_img.size
