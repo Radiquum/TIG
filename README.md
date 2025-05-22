@@ -3,15 +3,13 @@
 > [!WARNING]
 > This is a WIP project. Anything can be broken at any time until a stable release!
 
-> [!NOTE]
-> As of now it's expected that user of this project knows basic python syntax and can modify the files directly
-
-DESCRIPTION: TBD.
+Inspired by stanley parable loading screen
 
 ## Usage (Subject to change)
 
 Requirements:
-    - Python 3
+
+- Python 3.10+ (tested with 3.13.2)
 
 1. (optional) create a python environment
 
@@ -27,28 +25,20 @@ Requirements:
     pip install -r ./requirements.txt
     ```
 
-3. modify constants on the top of the mode file to your liking,
+3. run `python ./main.py`
 
-    note: colors should be provided as a full hex colors
-
-4. run modified script `python ./<filename>.py`
-
-## Footnote
-
-Inspired by stanley parable loading screen
-
-ability to run script without having to modify code directly will be added soon
+commands are providing help if one of argument `-h, --help, help` is provided or no arguments are provided
 
 ## Preview of output
 
-./line.py output
+draw line preview
 
 ![./line.py output](./docs/preview-line.png)
 
-./lines.py output
+draw fill preview
 
 ![./lines.py output](./docs/preview-lines.png)
 
-./angeled_lines.py output
+draw fill with --angle argument preview
 
 ![./angeled_lines.py output](./docs/preview-angeled-lines.png)
