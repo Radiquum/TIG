@@ -1,17 +1,24 @@
 import yaml
 import os
-from rich import print
 from .util import check_int, check_hex
+from .log import log
+import json
+from sys import exit
 
 
 class Config:
 
     def check_path(self, path: str = "config.yaml"):
+        if not path.endswith(".yaml") and not path.endswith(".json"):
+            log.error(
+                "Invalid config file extension provided, should be .yaml or .json"
+            )
+            exit(1)
         if os.path.exists(path):
-            print(f"[bold cyan]INFO:[/bold cyan] using config file `{path}`")
+            log.info(f"using config file `{path}`")
             return True
         else:
-            print(f"[bold cyan]INFO:[/bold cyan] created new config file `{path}`")
+            log.info(f"created new config file `{path}`")
             self.save(path)
 
     def __init__(self):
@@ -59,24 +66,44 @@ class Config:
         if path is None:
             path = self.config_file
 
-        _yaml = yaml.dump(self._conf)
-        with open(path, "w") as fp:
-            fp.write(
-                f"# CREATED BY TIG\n# DO NOT EDIT DIRECTLY UNLESS YOU KNOW WHAT YOU ARE DOING, OTHERWISE USE config set COMMAND!\n\n{_yaml}"
+        if path.endswith(".json"):
+            with open(path, "w") as fp:
+                json.dump(self.dict(), fp, indent=2)
+        elif path.endswith(".yaml"):
+            _yaml = yaml.dump(self._conf)
+            with open(path, "w") as fp:
+                fp.write(_yaml)
+        else:
+            log.error(
+                "Invalid config file extension provided, should be .yaml or .json"
             )
+            exit(1)
 
     def load(self, path: str | None = None):
         if path is None:
             path = self.config_file
         self.check_path(path)
 
-        with open(path, "r") as fp:
-            conf: dict = yaml.load(fp, yaml.Loader)
-            self.config_file = path
-            self._conf = conf
+        if path.endswith(".json"):
+            with open(path, "r") as fp:
+                conf: dict = json.load(fp)
+        elif path.endswith(".yaml"):
+            with open(path, "r") as fp:
+                conf: dict = yaml.load(fp, yaml.Loader)
+        else:
+            log.error(
+                "Invalid config file extension provided, should be .yaml or .json"
+            )
+            exit(1)
+
+        self.config_file = path
+        self._conf = conf
 
     def dict(self):
         return self._conf
+
+    def json(self):
+        return json.dumps(self.dict(), indent=2)
 
     def yaml(self):
         return yaml.dump(self.dict())
