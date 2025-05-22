@@ -187,7 +187,7 @@ if cmd_or_arg == "draw":
         arg = shift_argv()
 
     y_margin = -24
-    if arg == "--x-margin":
+    if arg == "--y-margin":
         y_margin = shift_argv()
         if not y_margin:
             print(f"[bold red]ERROR:[/bold red] y margin value not provided")
