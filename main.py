@@ -341,6 +341,7 @@ if cmd_or_arg == "draw":
             accent,
             x_margin,
             y_margin,
+            angle,
         )
 
     image.show()
