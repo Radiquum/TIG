@@ -7,7 +7,7 @@ def draw_line(width: int, height: int,
             text: str, text_color: str, bg_color: str,
             x_offset: int, x_pos: str, y_offset: int, y_pos: int,
             opacity: float, accent: int | str, x_margin: int,
-            angle: int, angle_x_pos: int, angle_y_pos: int
+            angle: int, angle_x_pos: int, angle_y_pos: int, gradient_step: int
         ):
     RESOLUTION = (width, height)
     FONT = ImageFont.truetype(font_file, font_size)
@@ -36,6 +36,8 @@ def draw_line(width: int, height: int,
 
     if isinstance(accent, int) and accent < 0:
         accent = total_words + accent
+    if accent == "gradient":
+        opacity = gradient_step
 
     # Loop
     current_word = 0
@@ -44,10 +46,20 @@ def draw_line(width: int, height: int,
     accent_col = rgb_to_rgba(col, 255)
 
     while current_word < total_words:
-        col = transp_col
+        draw_col = transp_col
         if (accent != "off" and (current_word + 1) == accent) or (accent == "all"):
-            col = accent_col
-        image_FG_draw.text((render_x_pos, render_y_pos), text, fill=col)
+            draw_col = accent_col
+        if accent == "gradient":
+            if (current_word + 1) < (total_words // 2) and not opacity >= 1:
+                opacity += gradient_step
+            else:
+                opacity -= gradient_step
+            transp_col = rgb_to_rgba(col, round(255 * opacity))
+            if (current_word + 1) == (total_words // 2):
+                draw_col = accent_col
+            if opacity > 1:
+                opacity = 1
+        image_FG_draw.text((render_x_pos, render_y_pos), text, fill=draw_col)
 
         render_x_pos += text_size + x_margin
         current_word += 1

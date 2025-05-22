@@ -139,18 +139,24 @@ if cmd_or_arg == "draw":
         arg = shift_argv()
 
     accent = -3
+    gradient_step = 0.1
+    if cmd == "fill" and "--angle" in arguments:
+        gradient_step = 0.01
     if arg == "--accent":
         accent = shift_argv()
         if not accent:
-            print(f"[bold red]ERROR:[/bold red] accent value not provided, should be a number, 'off' or 'all'")
+            print(f"[bold red]ERROR:[/bold red] accent value not provided, should be a number, 'off', 'all' or 'gradient'")
             sys.exit(1)
         if check_int(accent):
             accent = int(accent)
         else:
-            if accent not in ["off", "all"]:
-                print(f"[bold red]ERROR:[/bold red] invalid accent value not provided, should be a number, 'off' or 'all'")
+            if accent not in ["off", "all", "gradient"]:
+                print(f"[bold red]ERROR:[/bold red] invalid accent value not provided, should be a number, 'off', 'all' or 'gradient'")
                 sys.exit(1)
         arg = shift_argv()
+        if accent == "gradient" and not arg.startswith("--"):
+            gradient_step = float(arg)
+            arg = shift_argv()
 
     width = config.get_section_key("resolution", "width")
     height = config.get_section_key("resolution", "height")
@@ -321,7 +327,8 @@ if cmd_or_arg == "draw":
             x_margin,
             angle,
             angle_x_pos,
-            angle_y_pos
+            angle_y_pos,
+            gradient_step
         )
 
     if cmd == "fill":
@@ -342,6 +349,7 @@ if cmd_or_arg == "draw":
             x_margin,
             y_margin,
             angle,
+            gradient_step
         )
 
     image.show()

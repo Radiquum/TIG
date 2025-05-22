@@ -20,6 +20,7 @@ def draw_fill(
     x_margin: int,
     y_margin: int,
     angle: int,
+    gradient_step
 ):
     RESOLUTION = (width, height)
     FONT = ImageFont.truetype(font_file, font_size)
@@ -46,6 +47,8 @@ def draw_fill(
     total_lines = round(((height - y_pos) // (font_size + y_margin))) + 2
     if isinstance(accent, int) and accent < 0:
         accent = total_words + accent
+    if accent == "gradient":
+        opacity = gradient_step
 
     if angle != 0:
         total_lines = round(total_lines * 2)
@@ -68,12 +71,22 @@ def draw_fill(
     accent_col = rgb_to_rgba(col, 255)
 
     while current_line < total_lines:
-        col = transp_col
+        draw_col = transp_col
         if (accent != "off" and current_line == accent) or (accent == "all"):
-            col = accent_col
+            draw_col = accent_col
+        if accent == "gradient":
+            if (current_line) < (total_lines // 2) and not opacity >= 1:
+                opacity += gradient_step
+            else:
+                opacity -= gradient_step
+            transp_col = rgb_to_rgba(col, round(255 * opacity))
+            if (current_line) == (total_lines // 2):
+                draw_col = accent_col
+            if opacity > 1:
+                opacity = 1
 
         while current_word < total_words:
-            image_FG_draw.text((render_x_pos, render_y_pos), text, fill=col)
+            image_FG_draw.text((render_x_pos, render_y_pos), text, fill=draw_col)
 
             render_x_pos += text_size + x_margin
             current_word += 1
