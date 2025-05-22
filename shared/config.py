@@ -8,9 +8,11 @@ class Config:
 
     def check_path(self, path: str = "config.yaml"):
         if os.path.exists(path):
+            print(f"[bold cyan]INFO:[/bold cyan] using config file `{path}`")
             return True
-        print(f"[bold red]ERROR:[/bold red] Config file `{path}` not found.")
-        os._exit(1)
+        else:
+            print(f"[bold cyan]INFO:[/bold cyan] created new config file `{path}`")
+            self.save(path)
 
     def __init__(self):
         self.config_file = "config.yaml"
