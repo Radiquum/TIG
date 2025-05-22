@@ -1,12 +1,13 @@
 from PIL import Image, ImageFont, ImageDraw
 from rich import print
-from shared.util import hex_to_rgb, rgb_to_rgba
+from shared.util import hex_to_rgb, rgb_to_rgba, crop_center
 
 def draw_line(width: int, height: int,
             font_file: str, font_size: int,
             text: str, text_color: str, bg_color: str,
             x_offset: int, x_pos: str, y_offset: int, y_pos: int,
-            opacity: float, accent: int, x_margin: int,
+            opacity: float, accent: int | str, x_margin: int,
+            angle: int, angle_x_pos: int, angle_y_pos: int
         ):
     RESOLUTION = (width, height)
     FONT = ImageFont.truetype(font_file, font_size)
@@ -33,7 +34,7 @@ def draw_line(width: int, height: int,
     print(f"[bold cyan]TOTAL WORDS:[/bold cyan] {total_words}")
     print(f"[bold cyan]CENTER:[/bold cyan]      {total_words // 2}")
 
-    if accent < 0:
+    if isinstance(accent, int) and accent < 0:
         accent = total_words + accent
 
     # Loop
@@ -44,14 +45,18 @@ def draw_line(width: int, height: int,
 
     while current_word < total_words:
         col = transp_col
-        if (current_word + 1) == accent:
+        if (accent != "off" and (current_word + 1) == accent) or (accent == "all"):
             col = accent_col
         image_FG_draw.text((render_x_pos, render_y_pos), text, fill=col)
 
         render_x_pos += text_size + x_margin
         current_word += 1
 
-    image.paste(image_FG)
-    image = Image.alpha_composite(image_BG, image_FG)
+    if angle != 0:
+        image_FG = image_FG.rotate(angle, resample=Image.BICUBIC, expand=True)
+        image_FG = crop_center(image_FG, width, height)
 
-    return image
+    image.paste(image_FG, (angle_x_pos, angle_y_pos))
+    image_BG.paste(image, mask=image)
+
+    return image_BG

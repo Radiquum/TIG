@@ -89,7 +89,7 @@ def print_draw_cmd_cmd_help(program_name: str, cmd: str):
     print(f"                                                  [--x-margin] [--y-margin]")
     print(f"                                                  [--x-offset] [--x-pos] [--y-offset] [--y-pos]")
     print(f"                                                  [--text-color] [--background-color] [--font-size]")
-    print(f"                                                  [--preview]")
+    print(f"                                                  [--angle] [--angle-x-pos] [--angle-y-pos] [--preview]")
     print(f"NOTE: All arguments are case and order sensitive")
     print(f"")
     print(f"arguments:")
@@ -110,6 +110,9 @@ def print_draw_cmd_cmd_help(program_name: str, cmd: str):
     print(f"--text-color xxxxxx   overwrite text color")
     print(f"--background-color    overwrite background color")
     print(f"--font-size           overwrite font size")
+    print(f"--angle               rotate the text")
+    print(f"--angle-x-pos         absolute position of rotated text")
+    print(f"--angle-y-pos         absolute position of rotated text")
     print(f"--preview             open and don't save the image after generating")
     sys.exit(0)
 

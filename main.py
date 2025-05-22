@@ -7,7 +7,7 @@ from modules.cli.help import (
     print_draw_cmd_help,
     print_draw_cmd_cmd_help,
 )
-from shared.util import generate_random_symbols
+from shared.util import generate_random_symbols, check_int
 from rich import print
 import os
 import sys
@@ -142,9 +142,14 @@ if cmd_or_arg == "draw":
     if arg == "--accent":
         accent = shift_argv()
         if not accent:
-            print(f"[bold red]ERROR:[/bold red] accent value not provided")
+            print(f"[bold red]ERROR:[/bold red] accent value not provided, should be a number, 'off' or 'all'")
             sys.exit(1)
-        accent = int(accent)
+        if check_int(accent):
+            accent = int(accent)
+        else:
+            if accent not in ["off", "all"]:
+                print(f"[bold red]ERROR:[/bold red] invalid accent value not provided, should be a number, 'off' or 'all'")
+                sys.exit(1)
         arg = shift_argv()
 
     width = config.get_section_key("resolution", "width")
@@ -248,6 +253,33 @@ if cmd_or_arg == "draw":
         font_size = int(font_size)
         arg = shift_argv()
 
+    angle = 0
+    if arg == "--angle":
+        angle = shift_argv()
+        if not angle:
+            print(f"[bold red]ERROR:[/bold red] angle value not provided")
+            sys.exit(1)
+        angle = int(angle)
+        arg = shift_argv()
+
+    angle_x_pos = 0
+    if arg == "--angle-x-pos":
+        angle_x_pos = shift_argv()
+        if not angle_x_pos:
+            print(f"[bold red]ERROR:[/bold red] angle x pos value not provided")
+            sys.exit(1)
+        angle_x_pos = int(angle_x_pos)
+        arg = shift_argv()
+
+    angle_y_pos = 0
+    if arg == "--angle-y-pos":
+        angle_y_pos = shift_argv()
+        if not angle_y_pos:
+            print(f"[bold red]ERROR:[/bold red] angle y pos value not provided")
+            sys.exit(1)
+        angle_y_pos = int(angle_y_pos)
+        arg = shift_argv()
+
     preview_only = False
     if arg == "--preview":
         preview_only = True
@@ -268,6 +300,7 @@ if cmd_or_arg == "draw":
     print(f"margin:     hor: {x_margin}, ver: {y_margin}")
     print(f"x:          pos: {x_pos}, offset: {x_offset}")
     print(f"y:          pos: {y_pos}, offset: {y_offset}")
+    print(f"angle:      {angle}, x: {angle_x_pos}, y: {angle_y_pos}")
     print(f"[bold green]--------------------------[/bold green]")
 
     if cmd == "line":
@@ -286,6 +319,9 @@ if cmd_or_arg == "draw":
             opacity,
             accent,
             x_margin,
+            angle,
+            angle_x_pos,
+            angle_y_pos
         )
 
     if cmd == "fill":
