@@ -34,8 +34,8 @@ def draw_fill(width: int, height: int,
     print(f"[bold cyan]TOTAL LINES:[/bold cyan] {(total_lines - 1)}")
     print(f"[bold cyan]CENTER:[/bold cyan]      {(total_lines - 1) // 2}")
 
-    if accent < 0:
-        accent = total_lines + accent
+    if isinstance(accent, int) and accent < 0:
+        accent = total_words + accent
 
     # Loop
     current_word = 0
@@ -46,7 +46,7 @@ def draw_fill(width: int, height: int,
 
     while current_line < total_lines:
         col = transp_col
-        if current_line == accent:
+        if (accent != "off" and current_line == accent) or (accent == "all"):
             col = accent_col
 
         while current_word < total_words:
