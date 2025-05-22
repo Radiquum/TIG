@@ -71,8 +71,7 @@ class Config:
         with open(path, "r") as fp:
             conf: dict = yaml.load(fp, yaml.Loader)
             self.config_file = path
-            self._conf["resolution"]["width"] = conf.get("resolution").get("width")
-            self._conf["resolution"]["height"] = conf.get("resolution").get("height")
+            self._conf = conf
 
     def dict(self):
         return self._conf
