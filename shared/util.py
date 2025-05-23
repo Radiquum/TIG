@@ -71,7 +71,7 @@ def check_color(string: str):
                 "e",
                 "f",
             ]
-            string = string.strip("hex[").strip("]").lower()
+            string = string.removeprefix("hex[").removesuffix("]").lower()
             if len(string) < 6:
                 log.error(
                     f"invalid hex value, it should be in full format (6 symbols), got {string} ({len(string)} symbols)",
@@ -88,7 +88,7 @@ def check_color(string: str):
             string = str_to_hex(string)
     elif string.startswith("rgb["):
         allowed_symbols = [str(i) for i in range(256)]
-        string = string.strip("rgb[").strip("]").split(",")
+        string = string.removeprefix("rgb[").removesuffix("]").split(",")
         if len(string) < 3:
             log.error(
                 "invalid rgb value, it should be [[red]red[/red],[green]green[/green],[blue]blue[/blue]] in range 0-255",
