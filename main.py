@@ -80,7 +80,7 @@ draw_parser.add_argument(
 )
 draw_parser.add_argument(
     "--gradient-step",
-    type=float,
+    type=opacity_type,
     default=None,
     help="step in range from 0 to 1 if accent set to gradient",
     metavar="STEP",

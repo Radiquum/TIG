@@ -5,8 +5,8 @@ from typing import Literal
 def opacity_type(s: str) -> float:
     try:
         value = float(s)
-    except TypeError:
-        raise argparse.ArgumentTypeError(f"{s!r} is not a valid numeric value")
+    except TypeError as e:
+        raise argparse.ArgumentTypeError(f"{s!r} is not a valid numeric value") from e
 
     if not (0 <= value <= 1):
         raise argparse.ArgumentTypeError(f"{s} must be in the range 0-1")
@@ -20,5 +20,5 @@ def accent_type(s: str) -> int | Literal["off"] |  Literal["all"] |  Literal["gr
     try:
         value = int(s)
         return value
-    except TypeError:
-        raise argparse.ArgumentTypeError(f"{s!r} should be one of number|off|all|gradient")
+    except TypeError as e:
+        raise argparse.ArgumentTypeError(f"{s!r} should be one of number|off|all|gradient") from e
