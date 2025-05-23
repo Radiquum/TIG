@@ -3,6 +3,8 @@ import string
 from shared.log import log
 
 def check_int(s: str) -> bool:
+    if not isinstance(s, str) or len(s) < 1:
+        return False
     if s[0] in ("-", "+"):
         return s[1:].isdigit()
     return s.isdigit()
