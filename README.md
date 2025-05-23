@@ -39,8 +39,8 @@ draw fill preview
 
 draw fill with --angle argument preview
 
-![draw fill with --angle argument preview](./docs/preview-angeled-lines.png)
+![draw fill with --angle argument preview](./docs/preview-angle-lines.png)
 
-draw fill with --angle and --accent gradient argument preview
+draw fill with --angle and --accent gradient arguments preview
 
 ![draw fill with --angle and --accent gradient argument preview](./docs/preview-angle-gradient.png)
