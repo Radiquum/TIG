@@ -15,12 +15,10 @@ def opacity_type(s: str) -> float:
 
 
 def accent_type(s: str) -> int | Literal["off"] |  Literal["all"] |  Literal["gradient"]:
-    if s not in ["off", "all", "gradient"]:
-        try:
-            value = int(s)
-        except TypeError:
-            raise argparse.ArgumentTypeError(f"{s!r} should be one of number|off|all|gradient")
-
-    if isinstance(s, int):
-        return int(value)
-    return s
+    if s in ["off", "all", "gradient"]:
+        return s
+    try:
+        value = int(s)
+        return value
+    except TypeError:
+        raise argparse.ArgumentTypeError(f"{s!r} should be one of number|off|all|gradient")

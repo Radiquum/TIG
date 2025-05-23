@@ -253,7 +253,7 @@ if __name__ == "__main__":
             height = int(resolution[1])
             if args.debug:
                 log.debug(
-                    f"overwrote resolution {config.get_section_key("resolution", "width")}x{config.get_section_key("resolution", "height")} -> {width}x{height}",
+                    f"overwrote resolution {config.get_section_key('resolution', 'width')}x{config.get_section_key('resolution', 'height')} -> {width}x{height}",
                     extra={"highlighter": None},
                 )
 
