@@ -8,6 +8,7 @@ from shared.log import log
 from shared.util import check_int, check_color, generate_random_symbols
 from modules.draw.line import draw_line
 from modules.draw.fill import draw_fill
+from modules.types.custom import opacity_type, accent_type
 
 # --- Argument Parsers
 
@@ -67,12 +68,13 @@ draw_parser.add_argument(
 draw_parser.add_argument("text", metavar="TEXT", help="text to draw")
 draw_parser.add_argument(
     "--opacity",
-    type=float,
+    type=opacity_type,
     default=0.25,
     help="how transparent not accented words or lines will be, default: 0.25; allowed 0-1",
 )
 draw_parser.add_argument(
     "--accent",
+    type=accent_type,
     default=-3,
     help="what word or line will should be accented, default: -3; allowed number|off|all|gradient",
 )
@@ -224,22 +226,8 @@ if __name__ == "__main__":
             print(syntax)
             exit(0)
     if args.command == "draw":
-        if args.opacity < 0 or args.opacity > 1:
-            log.error(
-                f"invalid opacity value is provided, make sure it's in range from 0 to 1",
-                extra={"highlighter": None},
-            )
-            exit(0)
 
-        if args.accent not in ["off", "all", "gradient"]:
-            if not isinstance(args.accent, int):
-                log.error(
-                    f"invalid accent value is provided, should be one of number|off|all|gradient, got: {args.accent}",
-                    extra={"highlighter": None},
-                )
-                exit(0)
-
-        if not args.gradient_step:
+        if args.gradient_step is None:
             args.gradient_step = 0.1
             if args.mode == "fill" and args.angle != 0:
                 args.gradient_step = 0.01
