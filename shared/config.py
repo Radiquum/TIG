@@ -75,11 +75,12 @@ class Config:
     def save(self, path: str | None = None):
         if path is None:
             path = self.config_file
+        lower_path = path.lower()
 
-        if path.endswith(".json"):
+        if lower_path.endswith(".json"):
             with open(path, "w") as fp:
                 json.dump(self.dict(), fp, indent=2)
-        elif path.endswith(".yaml"):
+        elif lower_path.endswith(".yaml"):
             _yaml = yaml.dump(self._conf)
             with open(path, "w") as fp:
                 fp.write(_yaml)
@@ -93,11 +94,12 @@ class Config:
         if path is None:
             path = self.config_file
         self.check_path(path)
+        lower_path = path.lower()
 
-        if path.endswith(".json"):
+        if lower_path.endswith(".json"):
             with open(path, "r") as fp:
                 conf: dict = json.load(fp)
-        elif path.endswith(".yaml"):
+        elif lower_path.endswith(".yaml"):
             with open(path, "r") as fp:
                 conf: dict = yaml.load(fp, yaml.Loader)
         else:
