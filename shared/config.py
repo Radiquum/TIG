@@ -9,7 +9,8 @@ from sys import exit
 class Config:
 
     def check_path(self, path: str = "config.yaml"):
-        if not path.endswith(".yaml") and not path.endswith(".json"):
+        lower_path = path.lower()
+        if not lower_path.endswith(".yaml") and not lower_path.endswith(".json"):
             log.error(
                 "Invalid config file extension provided, should be .yaml or .json"
             )
