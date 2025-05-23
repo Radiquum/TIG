@@ -25,20 +25,22 @@ Requirements:
     pip install -r ./requirements.txt
     ```
 
-3. run `python ./main.py`
-
-commands are providing help if one of argument `-h, --help, help` is provided or no arguments are provided
+3. run `python ./main.py -h`
 
 ## Preview of output
 
 draw line preview
 
-![./line.py output](./docs/preview-line.png)
+![draw line preview](./docs/preview-line.png)
 
 draw fill preview
 
-![./lines.py output](./docs/preview-lines.png)
+![draw fill preview](./docs/preview-lines.png)
 
 draw fill with --angle argument preview
 
-![./angeled_lines.py output](./docs/preview-angeled-lines.png)
+![draw fill with --angle argument preview](./docs/preview-angle-lines.png)
+
+draw fill with --angle and --accent gradient arguments preview
+
+![draw fill with --angle and --accent gradient argument preview](./docs/preview-angle-gradient.png)

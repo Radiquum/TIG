@@ -1,361 +1,336 @@
-from shared.config import config
-from modules.cli.help import (
-    print_config_cmd_help,
-    print_config_inspect_cmd_help,
-    print_config_set_cmd_help,
-    print_main_help,
-    print_draw_cmd_help,
-    print_draw_cmd_cmd_help,
-)
-from shared.util import generate_random_symbols, check_int
 from rich import print
-import os
-import sys
+from rich.syntax import Syntax
+import argparse
+from sys import exit
+
+from shared.config import config
+from shared.log import log
+from shared.util import check_int, check_color, generate_random_symbols
 from modules.draw.line import draw_line
 from modules.draw.fill import draw_fill
+from modules.types.custom import opacity_type, accent_type
 
-if os.path.exists("config.yaml"):
-    config.load()
+# --- Argument Parsers
 
-arguments = sys.argv.copy()
+root_parser = argparse.ArgumentParser(add_help=False)
+root_parser.add_argument(
+    "-c",
+    "--config",
+    nargs="?",
+    default="config.yaml",
+    help="Provide a config file path, path should end with .yaml or .json, default: config.yaml",
+)
+root_parser.add_argument(
+    "--debug",
+    action="store_true",
+    default=False,
+    help="Debug the program",
+)
 
+main_parser = argparse.ArgumentParser("./main.py", parents=[root_parser])
+command_subparsers = main_parser.add_subparsers(title="command", dest="command")
 
-def shift_argv():
-    global arguments
-    if len(arguments) == 0:
-        return None
+## --- config parser
+config_parser = command_subparsers.add_parser(
+    "config", parents=[root_parser], help="modify config file"
+)
+config_subparsers = config_parser.add_subparsers(title="action", dest="action")
 
-    _arg = arguments[0]
-    arguments = arguments[1::]
-    return _arg
+config_set_parser = config_subparsers.add_parser(
+    "set",
+    parents=[root_parser],
+    help="set configuration",
+    formatter_class=argparse.RawTextHelpFormatter,
+)
+config_set_parser.add_argument(
+    "sk", help=config.get_config_sections_and_keys_types(), metavar="section.key"
+)
+config_set_parser.add_argument("value")
 
+config_inspect_parser = config_subparsers.add_parser(
+    "inspect", parents=[root_parser], help="display configuration"
+)
+config_inspect_parser.add_argument(
+    "type",
+    nargs="?",
+    choices=["yaml", "json"],
+    default="yaml",
+    help="display type, default: yaml",
+)
 
-program_name = shift_argv()
-cmd_or_arg = shift_argv()
+## --- draw parser
+draw_parser = command_subparsers.add_parser(
+    "draw", parents=[root_parser], help="generate an image from provided text"
+)
+draw_parser.add_argument(
+    "mode", metavar="MODE", choices=["line", "fill"], help="mode to use: line|fill"
+)
+draw_parser.add_argument("text", metavar="TEXT", help="text to draw")
+draw_parser.add_argument(
+    "--opacity",
+    type=opacity_type,
+    default=0.25,
+    help="how transparent not accented words or lines will be, default: 0.25; allowed 0-1",
+)
+draw_parser.add_argument(
+    "--accent",
+    type=accent_type,
+    default=-3,
+    help="what word or line will should be accented, default: -3; allowed number|off|all|gradient",
+)
+draw_parser.add_argument(
+    "--gradient-step",
+    type=opacity_type,
+    default=None,
+    help="step in range from 0 to 1 if accent set to gradient",
+    metavar="STEP",
+)
+draw_parser.add_argument("--resolution", help="overwrite resolution", metavar="WxH")
+draw_parser.add_argument(
+    "--text-color",
+    help="overwrite text color",
+    metavar="hex[value] | rgb[0-255,0-255,0-255]",
+)
+draw_parser.add_argument(
+    "--bg-color",
+    help="overwrite background color",
+    metavar="hex[value] | rgb[0-255,0-255,0-255]",
+)
+draw_parser.add_argument(
+    "--font-size", type=int, help="overwrite font size", metavar="SIZE"
+)
+draw_parser.add_argument(
+    "--angle", help="rotate the text by an angle, default: 0", default=0, type=int
+)
+draw_parser.add_argument(
+    "--x-pos", help="set start x position, default: 0", default=0, type=int
+)
+draw_parser.add_argument(
+    "--y-pos", help="set start y position, default: 0", default=0, type=int
+)
+draw_parser.add_argument(
+    "--x-offset", help="offset the x position, default: 0", default=0, type=int
+)
+draw_parser.add_argument(
+    "--y-offset", help="offset the y position, default: 0", default=0, type=int
+)
+draw_parser.add_argument(
+    "--x-margin", help="set margin between words, default: 4", default=4, type=int
+)
+draw_parser.add_argument(
+    "--y-margin", help="set margin between lines, default: -20", default=-20, type=int
+)
+draw_parser.add_argument(
+    "--angle-x-pos",
+    help="absolute x position of rotated text, default: 0",
+    default=0,
+    type=int,
+    metavar="X_POS",
+)
+draw_parser.add_argument(
+    "--angle-y-pos",
+    help="absolute y position of rotated text, default: 0",
+    default=0,
+    type=int,
+    metavar="Y_POS",
+)
+draw_parser.add_argument(
+    "--preview",
+    action="store_true",
+    default=False,
+    help="don't save the image after generating",
+)
 
-if not cmd_or_arg or cmd_or_arg in ["help", "-h", "--help"]:
-    print_main_help(program_name)
+## ------------
 
-if cmd_or_arg in ["-c", "--config"]:
-    path: str = shift_argv()
-    if not path:
-        print(f"[bold red]ERROR:[/bold red] path to config is not provided")
-        sys.exit(1)
-    if not path.endswith(".yaml"):
-        print(f"[bold red]ERROR:[/bold red] File not in `.yaml` format")
-        sys.exit(1)
-    config.load(path)
-    cmd_or_arg = shift_argv()
-    if not cmd_or_arg:
-        print_main_help(program_name)
+if __name__ == "__main__":
+    args = main_parser.parse_args()
+    config.load(args.config)
 
-if cmd_or_arg == "config":
-    cmd_or_arg = shift_argv()
-    if not cmd_or_arg or cmd_or_arg in ["help", "-h", "--help"]:
-        print_config_cmd_help(program_name)
-    if cmd_or_arg == "inspect":
-        cmd_or_arg = shift_argv()
-        if not cmd_or_arg or cmd_or_arg in ["help", "-h", "--help"]:
-            print_config_inspect_cmd_help(program_name)
-        if cmd_or_arg == "yaml":
-            print(config.yaml())
-            sys.exit(0)
-        if cmd_or_arg == "json":
-            print(config.dict())
-            sys.exit(0)
-    if cmd_or_arg == "set":
-        cmd_or_arg = shift_argv()
-        if not cmd_or_arg or cmd_or_arg in ["help", "-h", "--help"]:
-            print_config_set_cmd_help(program_name)
+    if args.debug:
+        log.debug("DEBUG MODE")
+        log.debug("provided arguments:")
+        log.debug(args)
+        log.debug("loaded config:")
+        log.debug(config.dict())
+        print("\n")
 
-        sk = cmd_or_arg.split(".")
-        if len(sk) < 2 or sk[1] == "":
-            print(
-                f"[bold red]ERROR:[/bold red] expected: section.key, got: {cmd_or_arg}"
-            )
-            print_config_set_cmd_help(program_name)
+    if not args.command:
+        main_parser.print_usage()
+        exit(1)
 
-        if sk[0] not in config.get_keys():
-            print(
-                f"[bold red]ERROR:[/bold red] wrong section name: {sk[0]}, should be one of {", ".join(config.get_keys())}"
-            )
-            print_config_set_cmd_help(program_name)
-
-        if sk[0] == "resolution":
-            if sk[1] not in config.get_section_keys("resolution"):
-                print(
-                    f"[bold red]ERROR:[/bold red] wrong section key: {sk[1]}, should be one of {", ".join(config.get_section_keys("resolution"))}"
+    if args.command == "config":
+        if not args.action:
+            config_parser.print_help()
+            exit(1)
+        if args.action == "set":
+            sk = args.sk.split(".")
+            if len(sk) < 2 or sk[1] == "":
+                log.error(
+                    f"expected: section.key, got: {args.sk}",
+                    extra={"highlighter": None},
                 )
-                print_config_set_cmd_help(program_name)
-        if sk[0] == "font":
-            if sk[1] not in config.get_section_keys("font"):
-                print(
-                    f"[bold red]ERROR:[/bold red] wrong section key: {sk[1]}, should be one of {", ".join(config.get_section_keys("font"))}"
+                exit(1)
+
+            if sk[0] not in config.get_keys():
+                log.error(
+                    f"invalid section name, expected: {'|'.join(config.get_keys())}, got: {sk[0]}",
+                    extra={"highlighter": None},
                 )
-                print_config_set_cmd_help(program_name)
-        if sk[0] in ["text", "background"]:
-            if sk[1] not in config.get_section_keys("text"):
-                print(
-                    f"[bold red]ERROR:[/bold red] wrong section key: {sk[1]}, should be one of {", ".join(config.get_section_keys("text"))}"
+                exit(1)
+
+            if sk[1] not in config.get_section_keys(sk[0]):
+                log.error(
+                    f"invalid section key, expected: {'|'.join(config.get_section_keys(sk[0]))}, got: {sk[1]}",
+                    extra={"highlighter": None},
                 )
-                print_config_set_cmd_help(program_name)
+                exit(1)
 
-        cmd_or_arg = shift_argv()
-        if not cmd_or_arg:
-            print(f"[bold red]ERROR:[/bold red] value not provided")
-            print_config_set_cmd_help(program_name)
+            if args.debug:
+                log.debug(f"section    : {sk[0]}")
+                log.debug(f"key        : {sk[1]}")
+                log.debug(
+                    f"value type : {config.get_config_section_key_type(sk[0], sk[1])}"
+                )
 
-        chk, exp_type = config.check_value_type(sk[0], sk[1], cmd_or_arg)
-        if chk is not True:
-            print(f"[bold red]ERROR:[/bold red] value should be a {exp_type}")
-            sys.exit(1)
-        if exp_type == "number":
-            cmd_or_arg = int(cmd_or_arg)
-        if exp_type == "xxxxxx":
-            cmd_or_arg = f"#{cmd_or_arg}"
+            value_type = config.get_config_section_key_type(sk[0], sk[1])
+            if value_type == "number":
+                if not check_int(args.value):
+                    log.error(
+                        f"invalid key value type, expected: {value_type}",
+                        extra={"highlighter": None},
+                    )
+                    exit(1)
+                args.value = int(args.value)
+            elif value_type == "hex[value] | rgb[0-255,0-255,0-255]":
+                args.value = check_color(args.value)
 
-        config.update_and_save(sk[0], sk[1], cmd_or_arg)
-        sys.exit(0)
+            if args.debug:
+                log.debug(f"value              : {args.value}")
 
-if cmd_or_arg == "draw":
-    cmd = shift_argv()
-    if not cmd or cmd in ["help", "-h", "--help"]:
-        print_draw_cmd_help(program_name)
+            config.update_and_save(sk[0], sk[1], args.value)
+            log.info(f"value of '{sk[0]}.{sk[1]}' updated to '{args.value}'")
+        if args.action == "inspect":
+            log.info(f"inspecting config as {args.type}")
+            print("\n")
+            match args.type:
+                case "yaml":
+                    syntax = Syntax(
+                        config.yaml(), "yaml", theme="github-dark", line_numbers=True
+                    )
+                case "json":
+                    syntax = Syntax(
+                        config.json(), "json", theme="github-dark", line_numbers=True
+                    )
+            print(syntax)
+    if args.command == "draw":
 
-    arg = shift_argv()
-    if arg in ["help", "-h", "--help", None]:
-        print_draw_cmd_cmd_help(program_name, cmd)
+        if args.gradient_step is None:
+            args.gradient_step = 0.1
+            if args.mode == "fill" and args.angle != 0:
+                args.gradient_step = 0.01
 
-    text = arg
-    arg = shift_argv()
+        width = config.get_section_key("resolution", "width")
+        height = config.get_section_key("resolution", "height")
 
-    opacity = 0.25
-    if arg == "--opacity":
-        opacity = shift_argv()
-        if not opacity:
-            print(f"[bold red]ERROR:[/bold red] opacity value not provided")
-            sys.exit(1)
-        opacity = float(opacity)
-        arg = shift_argv()
+        if args.resolution:
+            resolution = args.resolution.split("x")
+            if len(resolution) < 2 or resolution[1] == "":
+                log.error(
+                    f"expected: WxH, got: {args.resolution}",
+                    extra={"highlighter": None},
+                )
+                exit(1)
+            if not check_int(resolution[0]) or not check_int(resolution[1]):
+                log.error(
+                    f"resolution should be provided as INTxINT",
+                    extra={"highlighter": None},
+                )
+                exit(1)
+            width = int(resolution[0])
+            height = int(resolution[1])
+            if args.debug:
+                log.debug(
+                    f"overwrote resolution {config.get_section_key('resolution', 'width')}x{config.get_section_key('resolution', 'height')} -> {width}x{height}",
+                    extra={"highlighter": None},
+                )
 
-    accent = -3
-    gradient_step = 0.1
-    if cmd == "fill" and "--angle" in arguments:
-        gradient_step = 0.01
-    if arg == "--accent":
-        accent = shift_argv()
-        if not accent:
-            print(f"[bold red]ERROR:[/bold red] accent value not provided, should be a number, 'off', 'all' or 'gradient'")
-            sys.exit(1)
-        if check_int(accent):
-            accent = int(accent)
+        font_file = config.get_section_key("font", "file")
+        font_size = config.get_section_key("font", "size")
+        if args.font_size:
+            font_size = args.font_size
+
+        text_color = config.get_section_key("text", "color")
+        bg_color = config.get_section_key("background", "color")
+        if args.text_color:
+            text_color = check_color(args.text_color)
+        if args.bg_color:
+            bg_color = check_color(args.bg_color)
+
+        print("[bold green]------ USING PARAMS ------[/bold green]")
+        print(f"mode:       {args.mode}")
+        print(f"resolution: [bold cyan]{width}x{height}[/bold cyan] px")
+        print(f"font:       {font_file}, {font_size} pt")
+        print(f"colors:     FG: '{text_color}', BG: '{bg_color}'")
+        print(f"            opacity:  {args.opacity}")
+        if args.accent == "gradient":
+            print(f"accent:     {args.accent}, step: {args.gradient_step}")
         else:
-            if accent not in ["off", "all", "gradient"]:
-                print(f"[bold red]ERROR:[/bold red] invalid accent value not provided, should be a number, 'off', 'all' or 'gradient'")
-                sys.exit(1)
-        arg = shift_argv()
-        if accent == "gradient" and not arg.startswith("--"):
-            gradient_step = float(arg)
-            arg = shift_argv()
+            print(f"accent:     {args.accent}")
+        print(f"margin:     hor: {args.x_margin}, ver: {args.y_margin}")
+        print(f"x:          pos: {args.x_pos}, offset: {args.x_offset}")
+        print(f"y:          pos: {args.y_pos}, offset: {args.y_offset}")
+        print(
+            f"angle:      {args.angle} deg, x: {args.angle_x_pos}, y: {args.angle_y_pos}"
+        )
+        print("[bold green]--------------------------[/bold green]")
 
-    width = config.get_section_key("resolution", "width")
-    height = config.get_section_key("resolution", "height")
-    if arg == "--resolution":
-        resolution = shift_argv()
-        if not resolution:
-            print(f"[bold red]ERROR:[/bold red] resolution value not provided")
-            sys.exit(1)
-
-        resolution = resolution.split("x")
-        if len(resolution) < 2 or resolution[1] == "":
-            print(
-                f"[bold red]ERROR:[/bold red] invalid resolution value provided, should be WxH"
+        if args.mode == "line":
+            image = draw_line(
+                width,
+                height,
+                font_file,
+                font_size,
+                args.text,
+                text_color,
+                bg_color,
+                args.x_offset,
+                args.x_pos,
+                args.y_offset,
+                args.y_pos,
+                args.opacity,
+                args.accent,
+                args.x_margin,
+                args.angle,
+                args.angle_x_pos,
+                args.angle_y_pos,
+                args.gradient_step,
             )
-            sys.exit(1)
 
-        width = int(resolution[0])
-        height = int(resolution[1])
-        arg = shift_argv()
+        if args.mode == "fill":
+            image = draw_fill(
+                width,
+                height,
+                font_file,
+                font_size,
+                args.text,
+                text_color,
+                bg_color,
+                args.x_offset,
+                args.x_pos,
+                args.y_offset,
+                args.y_pos,
+                args.opacity,
+                args.accent,
+                args.x_margin,
+                args.y_margin,
+                args.angle,
+                args.gradient_step,
+            )
 
-    x_margin = 4
-    if arg == "--x-margin":
-        x_margin = shift_argv()
-        if not x_margin:
-            print(f"[bold red]ERROR:[/bold red] x margin value not provided")
-            sys.exit(1)
-        x_margin = int(x_margin)
-        arg = shift_argv()
-
-    y_margin = -24
-    if arg == "--y-margin":
-        y_margin = shift_argv()
-        if not y_margin:
-            print(f"[bold red]ERROR:[/bold red] y margin value not provided")
-            sys.exit(1)
-        y_margin = int(y_margin)
-        arg = shift_argv()
-
-    x_offset = 0
-    if arg == "--x-offset":
-        x_offset = shift_argv()
-        if not x_offset:
-            print(f"[bold red]ERROR:[/bold red] x offset value not provided")
-            sys.exit(1)
-        x_offset = int(x_offset)
-        arg = shift_argv()
-
-    x_pos = 0
-    if arg == "--x-pos":
-        x_pos = shift_argv()
-        if not x_pos:
-            print(f"[bold red]ERROR:[/bold red] x pos value not provided")
-            sys.exit(1)
-        x_pos = int(x_pos)
-        arg = shift_argv()
-
-    y_offset = 0
-    if arg == "--y-offset":
-        y_offset = shift_argv()
-        if not y_offset:
-            print(f"[bold red]ERROR:[/bold red] y offset value not provided")
-            sys.exit(1)
-        y_offset = int(y_offset)
-        arg = shift_argv()
-
-    y_pos = 0
-    if arg == "--y-pos":
-        y_pos = shift_argv()
-        if not y_pos:
-            print(f"[bold red]ERROR:[/bold red] y pos value not provided")
-            sys.exit(1)
-        y_pos = int(y_pos)
-        arg = shift_argv()
-
-    text_color = config.get_section_key("text", "color")
-    if arg == "--text-color":
-        text_color = shift_argv()
-        if not text_color:
-            print(f"[bold red]ERROR:[/bold red] text color value not provided")
-            sys.exit(1)
-        text_color = f"#{text_color}"
-        arg = shift_argv()
-
-    bg_color = config.get_section_key("background", "color")
-    if arg == "--background-color":
-        bg_color = shift_argv()
-        if not bg_color:
-            print(f"[bold red]ERROR:[/bold red] background color value not provided")
-            sys.exit(1)
-        bg_color = f"#{bg_color}"
-        arg = shift_argv()
-
-    font_file = config.get_section_key("font", "file")
-    font_size = config.get_section_key("font", "size")
-    if arg == "--font-size":
-        font_size = shift_argv()
-        if not font_size:
-            print(f"[bold red]ERROR:[/bold red] font size value not provided")
-            sys.exit(1)
-        font_size = int(font_size)
-        arg = shift_argv()
-
-    angle = 0
-    if arg == "--angle":
-        angle = shift_argv()
-        if not angle:
-            print(f"[bold red]ERROR:[/bold red] angle value not provided")
-            sys.exit(1)
-        angle = int(angle)
-        arg = shift_argv()
-
-    angle_x_pos = 0
-    if arg == "--angle-x-pos":
-        angle_x_pos = shift_argv()
-        if not angle_x_pos:
-            print(f"[bold red]ERROR:[/bold red] angle x pos value not provided")
-            sys.exit(1)
-        angle_x_pos = int(angle_x_pos)
-        arg = shift_argv()
-
-    angle_y_pos = 0
-    if arg == "--angle-y-pos":
-        angle_y_pos = shift_argv()
-        if not angle_y_pos:
-            print(f"[bold red]ERROR:[/bold red] angle y pos value not provided")
-            sys.exit(1)
-        angle_y_pos = int(angle_y_pos)
-        arg = shift_argv()
-
-    preview_only = False
-    if arg == "--preview":
-        preview_only = True
-        arg = shift_argv()
-
-    if len(arguments) > 0:
-        print(f"[bold red]ERROR:[/bold red] some arguments weren't processed")
-        print(f"{arguments}")
-        sys.exit(1)
-
-    print(f"[bold green]------ USING PARAMS ------[/bold green]")
-    print(f"mode:       {cmd}")
-    print(f"resolution: {width}x{height}px")
-    print(f"font:       {font_file}, {font_size}pt")
-    print(f"colors:     FG: {text_color}, BG: {bg_color}")
-    print(f"            opacity:  {opacity}")
-    print(f"accent:     {accent}  ")
-    print(f"margin:     hor: {x_margin}, ver: {y_margin}")
-    print(f"x:          pos: {x_pos}, offset: {x_offset}")
-    print(f"y:          pos: {y_pos}, offset: {y_offset}")
-    print(f"angle:      {angle}, x: {angle_x_pos}, y: {angle_y_pos}")
-    print(f"[bold green]--------------------------[/bold green]")
-
-    if cmd == "line":
-        image = draw_line(
-            width,
-            height,
-            font_file,
-            font_size,
-            text,
-            text_color,
-            bg_color,
-            x_offset,
-            x_pos,
-            y_offset,
-            y_pos,
-            opacity,
-            accent,
-            x_margin,
-            angle,
-            angle_x_pos,
-            angle_y_pos,
-            gradient_step
-        )
-
-    if cmd == "fill":
-        image = draw_fill(
-            width,
-            height,
-            font_file,
-            font_size,
-            text,
-            text_color,
-            bg_color,
-            x_offset,
-            x_pos,
-            y_offset,
-            y_pos,
-            opacity,
-            accent,
-            x_margin,
-            y_margin,
-            angle,
-            gradient_step
-        )
-
-    image.show()
-    if not preview_only:
-        image.save(
-            f"{cmd}_{width}x{height}_fg-{text_color[1:]}_bg-{bg_color[1:]}_{generate_random_symbols(6)}.png"
-        )
-
-    sys.exit(0)
+        image.show()
+        if not args.preview:
+            filename = f"{args.mode}_{width}x{height}_fg-{text_color[1:]}_bg-{bg_color[1:]}_{generate_random_symbols(6)}.png"
+            image.save(filename)
+            log.info(f"Image Saved as '{filename}'")
+    exit(0)
