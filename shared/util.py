@@ -50,7 +50,6 @@ def crop_center(pil_img, crop_width, crop_height):
     )
 
 def check_color(string: str):
-    value_type = "hex[value] | rgb[0-255,0-255,0-255]"
     if string.startswith("hex["):
             allowed_symbols = [
                 "0",
@@ -86,11 +85,11 @@ def check_color(string: str):
                     exit(0)
             string = str_to_hex(string)
     elif string.startswith("rgb["):
-        allowed_symbols = [str(i) for i in range(0, 256)]
+        allowed_symbols = [str(i) for i in range(256)]
         string = string.strip("rgb[").strip("]").split(",")
         if len(string) < 3:
             log.error(
-                f"invalid rgb value, it should be [[red]red[/red],[green]green[/green],[blue]blue[/blue]] in range 0-255",
+                "invalid rgb value, it should be [[red]red[/red],[green]green[/green],[blue]blue[/blue]] in range 0-255",
                 extra={"highlighter": None, "markup": True},
             )
             exit(0)
@@ -106,7 +105,7 @@ def check_color(string: str):
         )
     else:
         log.error(
-            f"invalid key value type, expected: {value_type}",
+            "invalid key value type, expected: hex[value] | rgb[0-255,0-255,0-255]",
             extra={"highlighter": None},
         )
         exit(0)

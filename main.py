@@ -269,7 +269,7 @@ if __name__ == "__main__":
         if args.bg_color:
             bg_color = check_color(args.bg_color)
 
-        print(f"[bold green]------ USING PARAMS ------[/bold green]")
+        print("[bold green]------ USING PARAMS ------[/bold green]")
         print(f"mode:       {args.mode}")
         print(f"resolution: [bold cyan]{width}x{height}[/bold cyan] px")
         print(f"font:       {font_file}, {font_size} pt")
@@ -285,7 +285,7 @@ if __name__ == "__main__":
         print(
             f"angle:      {args.angle} deg, x: {args.angle_x_pos}, y: {args.angle_y_pos}"
         )
-        print(f"[bold green]--------------------------[/bold green]")
+        print("[bold green]--------------------------[/bold green]")
 
         if args.mode == "line":
             image = draw_line(

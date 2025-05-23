@@ -49,12 +49,11 @@ class Config:
     def get_config_section_key_type(self, section: str, key: str):
         ktype = self.get_section_key(section, key)
         if isinstance(ktype, int):
-            return f"number"
+            return "number"
+        if key == "color":
+                return "hex[value] | rgb[0-255,0-255,0-255]"
         if isinstance(ktype, str):
-            if key == "color":
-                return f"hex[value] | rgb[0-255,0-255,0-255]"
-            else:
-                return f"string"
+                return "string"
 
     def get_config_sections_and_keys(self):
         string = ""
