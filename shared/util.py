@@ -77,14 +77,14 @@ def check_color(string: str):
                     f"invalid hex value, it should be in full format (6 symbols), got {string} ({len(string)} symbols)",
                     extra={"highlighter": None},
                 )
-                exit(0)
+                exit(1)
             for index, char in enumerate(string, start=1):
                 if char not in allowed_symbols:
                     log.error(
                         f"unexpected symbol `{char}` at index `{index}`, allowed only 0-9 a-f",
                         extra={"highlighter": None},
                     )
-                    exit(0)
+                    exit(1)
             string = str_to_hex(string)
     elif string.startswith("rgb["):
         allowed_symbols = [str(i) for i in range(256)]
@@ -94,14 +94,14 @@ def check_color(string: str):
                 "invalid rgb value, it should be [[red]red[/red],[green]green[/green],[blue]blue[/blue]] in range 0-255",
                 extra={"highlighter": None, "markup": True},
             )
-            exit(0)
+            exit(1)
         for index, char in enumerate(string, start=1):
             if char not in allowed_symbols:
                 log.error(
                     f"unexpected symbol `{char}` at index `{index}`, allowed only 0-255",
                     extra={"highlighter": None},
                 )
-                exit(0)
+                exit(1)
         string = rgb_to_hex(
             int(string[0]), int(string[1]), int(string[2])
         )
@@ -110,5 +110,5 @@ def check_color(string: str):
             "invalid key value type, expected: hex[value] | rgb[0-255,0-255,0-255]",
             extra={"highlighter": None},
         )
-        exit(0)
+        exit(1)
     return string

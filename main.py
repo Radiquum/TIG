@@ -170,21 +170,21 @@ if __name__ == "__main__":
                     f"expected: section.key, got: {args.sk}",
                     extra={"highlighter": None},
                 )
-                exit(0)
+                exit(1)
 
             if sk[0] not in config.get_keys():
                 log.error(
                     f"invalid section name, expected: {'|'.join(config.get_keys())}, got: {sk[0]}",
                     extra={"highlighter": None},
                 )
-                exit(0)
+                exit(1)
 
             if sk[1] not in config.get_section_keys(sk[0]):
                 log.error(
                     f"invalid section key, expected: {'|'.join(config.get_section_keys(sk[0]))}, got: {sk[1]}",
                     extra={"highlighter": None},
                 )
-                exit(0)
+                exit(1)
 
             if args.debug:
                 log.debug(f"section    : {sk[0]}")
@@ -200,7 +200,7 @@ if __name__ == "__main__":
                         f"invalid key value type, expected: {value_type}",
                         extra={"highlighter": None},
                     )
-                    exit(0)
+                    exit(1)
                 args.value = int(args.value)
             elif value_type == "hex[value] | rgb[0-255,0-255,0-255]":
                 args.value = check_color(args.value)
@@ -210,7 +210,6 @@ if __name__ == "__main__":
 
             config.update_and_save(sk[0], sk[1], args.value)
             log.info(f"value of '{sk[0]}.{sk[1]}' updated to '{args.value}'")
-            exit(0)
         if args.action == "inspect":
             log.info(f"inspecting config as {args.type}")
             print("\n")
@@ -224,7 +223,6 @@ if __name__ == "__main__":
                         config.json(), "json", theme="github-dark", line_numbers=True
                     )
             print(syntax)
-            exit(0)
     if args.command == "draw":
 
         if args.gradient_step is None:
@@ -242,13 +240,13 @@ if __name__ == "__main__":
                     f"expected: WxH, got: {args.resolution}",
                     extra={"highlighter": None},
                 )
-                exit(0)
+                exit(1)
             if not check_int(resolution[0]) or not check_int(resolution[1]):
                 log.error(
                     f"resolution should be provided as INTxINT",
                     extra={"highlighter": None},
                 )
-                exit(0)
+                exit(1)
             width = int(resolution[0])
             height = int(resolution[1])
             if args.debug:
@@ -335,3 +333,4 @@ if __name__ == "__main__":
             filename = f"{args.mode}_{width}x{height}_fg-{text_color[1:]}_bg-{bg_color[1:]}_{generate_random_symbols(6)}.png"
             image.save(filename)
             log.info(f"Image Saved as '{filename}'")
+    exit(0)
