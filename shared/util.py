@@ -1,6 +1,6 @@
 import random
 import string
-
+from shared.log import log
 
 def check_int(s: str) -> bool:
     if s[0] in ("-", "+"):
@@ -48,3 +48,66 @@ def crop_center(pil_img, crop_width, crop_height):
             (img_height + crop_height) // 2,
         )
     )
+
+def check_color(string: str):
+    value_type = "hex[value] | rgb[0-255,0-255,0-255]"
+    if string.startswith("hex["):
+            allowed_symbols = [
+                "0",
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "a",
+                "b",
+                "c",
+                "d",
+                "e",
+                "f",
+            ]
+            string = string.strip("hex[").strip("]").lower()
+            if len(string) < 6:
+                log.error(
+                    f"invalid hex value, it should be in full format (6 symbols), got {string} ({len(string)} symbols)",
+                    extra={"highlighter": None},
+                )
+                exit(0)
+            for index, char in enumerate(string, start=1):
+                if char not in allowed_symbols:
+                    log.error(
+                        f"unexpected symbol `{char}` at index `{index}`, allowed only 0-9 a-f",
+                        extra={"highlighter": None},
+                    )
+                    exit(0)
+            string = str_to_hex(string)
+    elif string.startswith("rgb["):
+        allowed_symbols = [str(i) for i in range(0, 256)]
+        string = string.strip("rgb[").strip("]").split(",")
+        if len(string) < 3:
+            log.error(
+                f"invalid rgb value, it should be [[red]red[/red],[green]green[/green],[blue]blue[/blue]] in range 0-255",
+                extra={"highlighter": None, "markup": True},
+            )
+            exit(0)
+        for index, char in enumerate(string, start=1):
+            if char not in allowed_symbols:
+                log.error(
+                    f"unexpected symbol `{char}` at index `{index}`, allowed only 0-255",
+                    extra={"highlighter": None},
+                )
+                exit(0)
+        string = rgb_to_hex(
+            int(string[0]), int(string[1]), int(string[2])
+        )
+    else:
+        log.error(
+            f"invalid key value type, expected: {value_type}",
+            extra={"highlighter": None},
+        )
+        exit(0)
+    return string

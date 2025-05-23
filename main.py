@@ -5,7 +5,9 @@ from sys import exit
 
 from shared.config import config
 from shared.log import log
-from shared.util import check_int, rgb_to_hex, str_to_hex
+from shared.util import check_int, check_color, generate_random_symbols
+from modules.draw.line import draw_line
+from modules.draw.fill import draw_fill
 
 # --- Argument Parsers
 
@@ -26,6 +28,8 @@ root_parser.add_argument(
 
 main_parser = argparse.ArgumentParser("./main.py", parents=[root_parser])
 command_subparsers = main_parser.add_subparsers(title="command", dest="command")
+
+## --- config parser
 config_parser = command_subparsers.add_parser(
     "config", parents=[root_parser], help="modify config file"
 )
@@ -53,7 +57,89 @@ config_inspect_parser.add_argument(
     help="display type, default: yaml",
 )
 
-# ------------
+## --- draw parser
+draw_parser = command_subparsers.add_parser(
+    "draw", parents=[root_parser], help="generate an image from provided text"
+)
+draw_parser.add_argument(
+    "mode", metavar="MODE", choices=["line", "fill"], help="mode to use: line|fill"
+)
+draw_parser.add_argument("text", metavar="TEXT", help="text to draw")
+draw_parser.add_argument(
+    "--opacity",
+    type=float,
+    default=0.25,
+    help="how transparent not accented words or lines will be, default: 0.25; allowed 0-1",
+)
+draw_parser.add_argument(
+    "--accent",
+    default=-3,
+    help="what word or line will should be accented, default: -3; allowed number|off|all|gradient",
+)
+draw_parser.add_argument(
+    "--gradient-step",
+    type=float,
+    default=None,
+    help="step in range from 0 to 1 if accent set to gradient",
+    metavar="STEP",
+)
+draw_parser.add_argument("--resolution", help="overwrite resolution", metavar="WxH")
+draw_parser.add_argument(
+    "--text-color",
+    help="overwrite text color",
+    metavar="hex[value] | rgb[0-255,0-255,0-255]",
+)
+draw_parser.add_argument(
+    "--bg-color",
+    help="overwrite background color",
+    metavar="hex[value] | rgb[0-255,0-255,0-255]",
+)
+draw_parser.add_argument(
+    "--font-size", type=int, help="overwrite font size", metavar="SIZE"
+)
+draw_parser.add_argument(
+    "--angle", help="rotate the text by an angle, default: 0", default=0, type=int
+)
+draw_parser.add_argument(
+    "--x-pos", help="set start x position, default: 0", default=0, type=int
+)
+draw_parser.add_argument(
+    "--y-pos", help="set start y position, default: 0", default=0, type=int
+)
+draw_parser.add_argument(
+    "--x-offset", help="offset the x position, default: 0", default=0, type=int
+)
+draw_parser.add_argument(
+    "--y-offset", help="offset the y position, default: 0", default=0, type=int
+)
+draw_parser.add_argument(
+    "--x-margin", help="set margin between words, default: 4", default=4, type=int
+)
+draw_parser.add_argument(
+    "--y-margin", help="set margin between lines, default: -20", default=-20, type=int
+)
+draw_parser.add_argument(
+    "--angle-x-pos",
+    help="absolute x position of rotated text, default: 0",
+    default=0,
+    type=int,
+    metavar="X_POS",
+)
+draw_parser.add_argument(
+    "--angle-y-pos",
+    help="absolute y position of rotated text, default: 0",
+    default=0,
+    type=int,
+    metavar="Y_POS",
+)
+draw_parser.add_argument(
+    "--preview",
+    action="store_true",
+    default=False,
+    help="don't save the image after generating",
+)
+
+## ------------
 
 if __name__ == "__main__":
     args = main_parser.parse_args()
@@ -115,65 +201,7 @@ if __name__ == "__main__":
                     exit(0)
                 args.value = int(args.value)
             elif value_type == "hex[value] | rgb[0-255,0-255,0-255]":
-                if args.value.startswith("hex["):
-                    allowed_symbols = [
-                        "0",
-                        "1",
-                        "2",
-                        "3",
-                        "4",
-                        "5",
-                        "6",
-                        "7",
-                        "8",
-                        "9",
-                        "a",
-                        "b",
-                        "c",
-                        "d",
-                        "e",
-                        "f",
-                    ]
-                    args.value = args.value.strip("hex[").strip("]").lower()
-                    if len(args.value) < 6:
-                        log.error(
-                            f"invalid hex value, it should be in full format (6 symbols), got {args.value} ({len(args.value)} symbols)",
-                            extra={"highlighter": None},
-                        )
-                        exit(0)
-                    for index, char in enumerate(args.value, start=1):
-                        if char not in allowed_symbols:
-                            log.error(
-                                f"unexpected symbol `{char}` at index `{index}`, allowed only 0-9 a-f",
-                                extra={"highlighter": None},
-                            )
-                            exit(0)
-                    args.value = str_to_hex(args.value)
-                elif args.value.startswith("rgb["):
-                    allowed_symbols = [str(i) for i in range(0, 256)]
-                    args.value = args.value.strip("rgb[").strip("]").split(",")
-                    if len(args.value) < 3:
-                        log.error(
-                            f"invalid rgb value, it should be [[red]red[/red],[green]green[/green],[blue]blue[/blue]] in range 0-255",
-                            extra={"highlighter": None, "markup": True},
-                        )
-                        exit(0)
-                    for index, char in enumerate(args.value, start=1):
-                        if char not in allowed_symbols:
-                            log.error(
-                                f"unexpected symbol `{char}` at index `{index}`, allowed only 0-255",
-                                extra={"highlighter": None},
-                            )
-                            exit(0)
-                    args.value = rgb_to_hex(
-                        int(args.value[0]), int(args.value[1]), int(args.value[2])
-                    )
-                else:
-                    log.error(
-                        f"invalid key value type, expected: {value_type}",
-                        extra={"highlighter": None},
-                    )
-                    exit(0)
+                args.value = check_color(args.value)
 
             if args.debug:
                 log.debug(f"value              : {args.value}")
@@ -195,3 +223,127 @@ if __name__ == "__main__":
                     )
             print(syntax)
             exit(0)
+    if args.command == "draw":
+        if args.opacity < 0 or args.opacity > 1:
+            log.error(
+                f"invalid opacity value is provided, make sure it's in range from 0 to 1",
+                extra={"highlighter": None},
+            )
+            exit(0)
+
+        if args.accent not in ["off", "all", "gradient"]:
+            if not isinstance(args.accent, int):
+                log.error(
+                    f"invalid accent value is provided, should be one of number|off|all|gradient, got: {args.accent}",
+                    extra={"highlighter": None},
+                )
+                exit(0)
+
+        if not args.gradient_step:
+            args.gradient_step = 0.1
+            if args.mode == "fill" and args.angle != 0:
+                args.gradient_step = 0.01
+
+        width = config.get_section_key("resolution", "width")
+        height = config.get_section_key("resolution", "height")
+
+        if args.resolution:
+            resolution = args.resolution.split("x")
+            if len(resolution) < 2 or resolution[1] == "":
+                log.error(
+                    f"expected: WxH, got: {args.resolution}",
+                    extra={"highlighter": None},
+                )
+                exit(0)
+            if not check_int(resolution[0]) or not check_int(resolution[1]):
+                log.error(
+                    f"resolution should be provided as INTxINT",
+                    extra={"highlighter": None},
+                )
+                exit(0)
+            width = int(resolution[0])
+            height = int(resolution[1])
+            if args.debug:
+                log.debug(
+                    f"overwrote resolution {config.get_section_key("resolution", "width")}x{config.get_section_key("resolution", "height")} -> {width}x{height}",
+                    extra={"highlighter": None},
+                )
+
+        font_file = config.get_section_key("font", "file")
+        font_size = config.get_section_key("font", "size")
+        if args.font_size:
+            font_size = args.font_size
+
+        text_color = config.get_section_key("text", "color")
+        bg_color = config.get_section_key("background", "color")
+        if args.text_color:
+            text_color = check_color(args.text_color)
+        if args.bg_color:
+            bg_color = check_color(args.bg_color)
+
+        print(f"[bold green]------ USING PARAMS ------[/bold green]")
+        print(f"mode:       {args.mode}")
+        print(f"resolution: [bold cyan]{width}x{height}[/bold cyan] px")
+        print(f"font:       {font_file}, {font_size} pt")
+        print(f"colors:     FG: '{text_color}', BG: '{bg_color}'")
+        print(f"            opacity:  {args.opacity}")
+        if args.accent == "gradient":
+            print(f"accent:     {args.accent}, step: {args.gradient_step}")
+        else:
+            print(f"accent:     {args.accent}")
+        print(f"margin:     hor: {args.x_margin}, ver: {args.y_margin}")
+        print(f"x:          pos: {args.x_pos}, offset: {args.x_offset}")
+        print(f"y:          pos: {args.y_pos}, offset: {args.y_offset}")
+        print(
+            f"angle:      {args.angle} deg, x: {args.angle_x_pos}, y: {args.angle_y_pos}"
+        )
+        print(f"[bold green]--------------------------[/bold green]")
+
+        if args.mode == "line":
+            image = draw_line(
+                width,
+                height,
+                font_file,
+                font_size,
+                args.text,
+                text_color,
+                bg_color,
+                args.x_offset,
+                args.x_pos,
+                args.y_offset,
+                args.y_pos,
+                args.opacity,
+                args.accent,
+                args.x_margin,
+                args.angle,
+                args.angle_x_pos,
+                args.angle_y_pos,
+                args.gradient_step,
+            )
+
+        if args.mode == "fill":
+            image = draw_fill(
+                width,
+                height,
+                font_file,
+                font_size,
+                args.text,
+                text_color,
+                bg_color,
+                args.x_offset,
+                args.x_pos,
+                args.y_offset,
+                args.y_pos,
+                args.opacity,
+                args.accent,
+                args.x_margin,
+                args.y_margin,
+                args.angle,
+                args.gradient_step,
+            )
+
+        image.show()
+        if not args.preview:
+            filename = f"{args.mode}_{width}x{height}_fg-{text_color[1:]}_bg-{bg_color[1:]}_{generate_random_symbols(6)}.png"
+            image.save(filename)
+            log.info(f"Image Saved as '{filename}'")
