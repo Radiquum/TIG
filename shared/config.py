@@ -72,23 +72,6 @@ class Config:
 
         return string
 
-    def check_value_type(
-        self, section: str, key: str, value: str | int
-    ) -> tuple[bool, str]:
-        if section in ["resolution"] and key in self.get_section_keys("resolution"):
-            if check_int(value):
-                return True, "number"
-            return False, "number"
-        if section in ["font"]:
-            if key == "size":
-                if check_int(value):
-                    return True, "number"
-                return False, "number"
-            return True, "string"
-        if section in ["text", "background"] and key in self.get_section_keys("text"):
-            return check_hex(value), "xxxxxx"
-        raise
-
     def save(self, path: str | None = None):
         if path is None:
             path = self.config_file
