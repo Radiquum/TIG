@@ -5,7 +5,7 @@
 
 Inspired by stanley parable loading screen
 
-## Usage (Subject to change)
+## Usage
 
 Requirements:
 
