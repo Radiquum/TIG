@@ -8,7 +8,8 @@ from shared.log import log
 from shared.util import check_int, check_color, generate_random_symbols
 from modules.draw.line import draw_line
 from modules.draw.fill import draw_fill
-from modules.types.custom import opacity_type, accent_type
+from modules.draw.square import draw_square
+from modules.types.custom import opacity_type, accent_type, twoone_tuple_int
 
 # --- Argument Parsers
 
@@ -63,7 +64,10 @@ draw_parser = command_subparsers.add_parser(
     "draw", parents=[root_parser], help="generate an image from provided text"
 )
 draw_parser.add_argument(
-    "mode", metavar="MODE", choices=["line", "fill"], help="mode to use: line|fill"
+    "mode",
+    metavar="MODE",
+    choices=["line", "fill", "square"],
+    help="mode to use: line|fill",
 )
 draw_parser.add_argument("text", metavar="TEXT", help="text to draw")
 draw_parser.add_argument(
@@ -133,6 +137,12 @@ draw_parser.add_argument(
     default=0,
     type=int,
     metavar="Y_POS",
+)
+draw_parser.add_argument(
+    "--border",
+    type=twoone_tuple_int,
+    default=None,
+    help="add a border around the text, --border X,[Y]",
 )
 draw_parser.add_argument(
     "--preview",
@@ -267,6 +277,14 @@ if __name__ == "__main__":
         if args.bg_color:
             bg_color = check_color(args.bg_color)
 
+        if args.mode == "square":
+            if args.x_margin == 4:
+                args.x_margin = 0
+            if args.y_margin == -20:
+                args.y_margin = 0
+            if args.accent == -3:
+                args.accent = "all"
+
         print("[bold green]------ USING PARAMS ------[/bold green]")
         print(f"mode:       {args.mode}")
         print(f"resolution: [bold cyan]{width}x{height}[/bold cyan] px")
@@ -305,6 +323,7 @@ if __name__ == "__main__":
                 args.angle_x_pos,
                 args.angle_y_pos,
                 args.gradient_step,
+                args.border
             )
 
         if args.mode == "fill":
@@ -326,6 +345,25 @@ if __name__ == "__main__":
                 args.y_margin,
                 args.angle,
                 args.gradient_step,
+                args.border
+            )
+
+        if args.mode == "square":
+            image = draw_square(
+                width,
+                height,
+                font_file,
+                font_size,
+                args.text,
+                text_color,
+                bg_color,
+                args.x_pos,
+                args.y_pos,
+                args.opacity,
+                args.accent,
+                args.x_margin,
+                args.y_margin,
+                args.border
             )
 
         image.show()

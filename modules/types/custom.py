@@ -22,3 +22,15 @@ def accent_type(s: str) -> int | Literal["off"] |  Literal["all"] |  Literal["gr
         return value
     except TypeError as e:
         raise argparse.ArgumentTypeError(f"{s!r} should be one of number|off|all|gradient") from e
+
+
+def twoone_tuple_int(s: str) -> tuple[int,int]:
+    int1 = 0
+    int2 = 0
+    ints = s.split(",")
+    int1 = int(ints[0])
+    if len(ints) < 2 or ints[1] == "":
+        int2 = int1
+    else:
+        int2 = int(ints[1])
+    return int1, int2

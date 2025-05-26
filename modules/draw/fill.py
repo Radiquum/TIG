@@ -20,7 +20,8 @@ def draw_fill(
     x_margin: int,
     y_margin: int,
     angle: int,
-    gradient_step
+    gradient_step: float,
+    border: tuple[int,int]
 ):
     RESOLUTION = (width, height)
     FONT = ImageFont.truetype(font_file, font_size)
@@ -102,5 +103,9 @@ def draw_fill(
 
     image.paste(image_FG)
     image = Image.alpha_composite(image_BG, image_FG)
+
+    if border and border[0] != 0:
+        image = image.crop((border[0], border[1], image.width - border[0], image.height - border[1]))
+        image = ImageOps.expand(image, (border[0], border[1]), fill=bg_color)
 
     return image
