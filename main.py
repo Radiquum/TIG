@@ -9,7 +9,7 @@ from shared.util import check_int, check_color, generate_random_symbols
 from modules.draw.line import draw_line
 from modules.draw.fill import draw_fill
 from modules.draw.square import draw_square
-from modules.types.custom import opacity_type, accent_type
+from modules.types.custom import opacity_type, accent_type, twoone_tuple_int
 
 # --- Argument Parsers
 
@@ -137,6 +137,12 @@ draw_parser.add_argument(
     default=0,
     type=int,
     metavar="Y_POS",
+)
+draw_parser.add_argument(
+    "--border",
+    type=twoone_tuple_int,
+    default=None,
+    help="add a border around the text, --border X,[Y]",
 )
 draw_parser.add_argument(
     "--preview",
@@ -317,6 +323,7 @@ if __name__ == "__main__":
                 args.angle_x_pos,
                 args.angle_y_pos,
                 args.gradient_step,
+                args.border
             )
 
         if args.mode == "fill":
@@ -338,6 +345,7 @@ if __name__ == "__main__":
                 args.y_margin,
                 args.angle,
                 args.gradient_step,
+                args.border
             )
 
         if args.mode == "square":
@@ -355,7 +363,7 @@ if __name__ == "__main__":
                 args.accent,
                 args.x_margin,
                 args.y_margin,
-                args.gradient_step,
+                args.border
             )
 
         image.show()

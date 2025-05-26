@@ -1,4 +1,4 @@
-from PIL import Image, ImageFont, ImageDraw, ImageEnhance
+from PIL import Image, ImageFont, ImageDraw, ImageEnhance, ImageOps
 from shared.util import hex_to_rgb
 from shared.log import log
 from sys import exit
@@ -17,7 +17,7 @@ def draw_square(
     accent: int | str,
     x_margin: int,
     y_margin: int,
-    gradient_step: int,
+    border: tuple[int,int]
 ):
     RESOLUTION = (width, height)
     FONT = ImageFont.truetype(font_file, font_size)
@@ -105,5 +105,9 @@ def draw_square(
 
     image.paste(image_FG, (0, 0))
     image_BG.paste(image, mask=image)
+
+    if border and border[0] != 0:
+        image_BG = image_BG.crop((border[0], border[1], image_BG.width - border[0], image_BG.height - border[1]))
+        image_BG = ImageOps.expand(image_BG, (border[0], border[1]), fill=bg_color)
 
     return image_BG
