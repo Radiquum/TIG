@@ -44,3 +44,7 @@ draw fill with --angle argument preview
 draw fill with --angle and --accent gradient arguments preview
 
 ![draw fill with --angle and --accent gradient argument preview](./docs/preview-angle-gradient.png)
+
+draw square preview
+
+![draw square preview](./docs/preview-square.png)
