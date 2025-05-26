@@ -11,7 +11,9 @@ def draw_square(
     text: str,
     text_color: str,
     bg_color: str,
+    x_offset: int,
     x_pos: str,
+    y_offset: int,
     y_pos: int,
     opacity: float,
     accent: int | str,
@@ -100,10 +102,10 @@ def draw_square(
 
             image_FG.paste(TEXT_LAYER_COPY, (render_x_pos, render_y_pos))
             render_x_pos += image_TEXT_Combine.width + x_margin
-        render_x_pos = x_margin
+        render_x_pos = x_pos + x_margin
         render_y_pos += image_TEXT_Combine.height + y_margin
 
-    image.paste(image_FG, (0, 0))
+    image.paste(image_FG, (x_offset, y_offset))
     image_BG.paste(image, mask=image)
 
     if border and border[0] != 0:
